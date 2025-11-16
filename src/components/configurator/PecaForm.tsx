@@ -76,6 +76,10 @@ const PecaForm = ({ peca, index, onUpdate, onRemove, canRemove }: PecaFormProps)
     });
   };
 
+  // Validar se detalhes são obrigatórios quando serviço != "sem_servico"
+  const detalhesObrigatorios = peca.servico !== "sem_servico";
+  const detalhesPreenchidos = peca.detalhesServico?.textoDetalhes && peca.detalhesServico.textoDetalhes.trim().length > 0;
+
   const comprimentoValido = !erroComprimento && comprimento;
   const quantidadeValida = !erroQuantidade && quantidade;
 
@@ -171,7 +175,7 @@ const PecaForm = ({ peca, index, onUpdate, onRemove, canRemove }: PecaFormProps)
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground">
-            Os serviços de usinagem não possuem custo adicional
+            Serviços listados sem custo adicional. Produto personalizado. Devolução ou trocas de acordo com o art. 18 do CDC.
           </p>
         </div>
 
@@ -181,6 +185,16 @@ const PecaForm = ({ peca, index, onUpdate, onRemove, canRemove }: PecaFormProps)
           detalhes={peca.detalhesServico}
           onChange={handleDetalhesChange}
         />
+
+        {/* Alerta se detalhes obrigatórios não preenchidos */}
+        {detalhesObrigatorios && !detalhesPreenchidos && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Por favor, preencha os detalhes do serviço selecionado
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Preço */}
         <div className="pt-4 border-t">

@@ -3,7 +3,7 @@ import { PecaPerfil2040 } from "@/types/product";
 export function calcularPrecoPeca(
   comprimentoMm: number,
   quantidade: number,
-  precoPorMetro: number = 72.0
+  precoPorMetro: number = 99.0
 ): number {
   const comprimentoM = comprimentoMm / 1000;
   const total = comprimentoM * precoPorMetro * quantidade;
@@ -12,7 +12,7 @@ export function calcularPrecoPeca(
 
 export function calcularResumoPedido(
   pecas: PecaPerfil2040[],
-  precoPorMetro: number = 72.0
+  precoPorMetro: number = 99.0
 ): { totalMetros: number; totalValor: number } {
   let totalMetros = 0;
   let totalValor = 0;
