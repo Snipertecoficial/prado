@@ -46,13 +46,8 @@ const Configurator = () => {
     }
   };
 
-  const handleAddToCart = () => {
-    toast({
-      title: "Produto adicionado ao carrinho!",
-      description: `${pecas.length} tipo(s) de peça(s) adicionado(s) com sucesso.`,
-    });
-    // Aqui você integraria com Shopify ou seu sistema de carrinho
-  };
+  // ID do variant do produto no Shopify (criado automaticamente)
+  const PRODUCT_VARIANT_ID = "gid://shopify/ProductVariant/51350863446327";
 
   return (
     <div className="min-h-screen bg-background">
@@ -115,7 +110,7 @@ const Configurator = () => {
             <div className="sticky top-24">
               <ResumoOrcamento
                 pecas={pecas}
-                onAddToCart={handleAddToCart}
+                productVariantId={PRODUCT_VARIANT_ID}
               />
             </div>
           </div>
