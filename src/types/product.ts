@@ -9,12 +9,8 @@ export type TipoServico =
   | "furo_conexao_capa_fechamento";
 
 export interface DetalhesServico {
-  distanciaXMm?: number;
-  face?: string;
-  tipoRosca?: string;
-  profundidade?: number;
-  angulo?: number;
-  extremidade?: string;
+  tipoDetalhe?: string; // Select opcional (ex: "S/ Serviço", "Furo em uma extremidade", etc)
+  textoDetalhes?: string; // Textarea para descrição livre
 }
 
 export interface PecaPerfil2040 {
@@ -58,4 +54,4 @@ export const COMPRIMENTO_MIN = 40;
 export const COMPRIMENTO_MAX = 3000;
 export const TOLERANCIA_CAMPO = 1;
 export const TOLERANCIA_CORTE = 3;
-export const PRECO_POR_METRO_DEFAULT = 72.0;
+export const PRECO_POR_METRO_DEFAULT = 99.0;

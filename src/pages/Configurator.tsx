@@ -18,7 +18,7 @@ const Configurator = () => {
       quantidade: 1,
       servico: "sem_servico",
       precoPorMetro: PRECO_POR_METRO_DEFAULT,
-      precoTotalPeca: 36.0,
+      precoTotalPeca: 49.5,
     },
   ]);
 
@@ -29,7 +29,7 @@ const Configurator = () => {
       quantidade: 1,
       servico: "sem_servico",
       precoPorMetro: PRECO_POR_METRO_DEFAULT,
-      precoTotalPeca: 36.0,
+      precoTotalPeca: 49.5,
     };
     setPecas([...pecas, novaPeca]);
   };
@@ -78,7 +78,7 @@ const Configurator = () => {
             Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6
           </p>
           <p className="text-sm text-muted-foreground mt-1">
-            Código: PF20-12-PP-c9 | Preço base: R$ 72,00/metro
+            Código: PF20-12-PP-c9 | Preço base: R$ 99,00/metro
           </p>
         </div>
 
