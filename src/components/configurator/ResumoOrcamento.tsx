@@ -18,10 +18,12 @@ import {
 interface ResumoOrcamentoProps {
   pecas: PecaPerfil2040[];
   productVariantId: string;
+  produtoConfig?: import("@/types/product").ProdutoConfig;
 }
 
-const ResumoOrcamento = ({ pecas, productVariantId }: ResumoOrcamentoProps) => {
-  const resumo = calcularResumoPedido(pecas);
+const ResumoOrcamento = ({ pecas, productVariantId, produtoConfig }: ResumoOrcamentoProps) => {
+  const precoPorMetro = produtoConfig?.precoPorMetro || 99.0;
+  const resumo = calcularResumoPedido(pecas, precoPorMetro);
   const { addItem, createCheckout, isLoading } = useCartStore();
   const { toast } = useToast();
 

@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { X, AlertCircle, CheckCircle2 } from "lucide-react";
-import { PecaPerfil2040, SERVICOS_OPTIONS, COMPRIMENTO_MIN, COMPRIMENTO_MAX, TipoServico } from "@/types/product";
+import { PecaPerfil2040, SERVICOS_OPTIONS, TipoServico, ProdutoConfig } from "@/types/product";
 import { calcularPrecoPeca, formatarPreco, validarComprimento, validarQuantidade } from "@/lib/calculations";
 import DetalhesServicoFields from "./DetalhesServicoFields";
 
@@ -17,9 +17,10 @@ interface PecaFormProps {
   onUpdate: (peca: PecaPerfil2040) => void;
   onRemove: () => void;
   canRemove: boolean;
+  produtoConfig?: ProdutoConfig;
 }
 
-const PecaForm = ({ peca, index, onUpdate, onRemove, canRemove }: PecaFormProps) => {
+const PecaForm = ({ peca, index, onUpdate, onRemove, canRemove, produtoConfig }: PecaFormProps) => {
   const [comprimento, setComprimento] = useState(peca.comprimentoMm.toString());
   const [quantidade, setQuantidade] = useState(peca.quantidade.toString());
   const [erroComprimento, setErroComprimento] = useState<string>();
@@ -28,11 +29,12 @@ const PecaForm = ({ peca, index, onUpdate, onRemove, canRemove }: PecaFormProps)
   const handleComprimentoChange = (value: string) => {
     setComprimento(value);
     const num = parseInt(value);
-    const validacao = validarComprimento(num);
+    const validacao = validarComprimento(num, produtoConfig);
     
     if (validacao.valido) {
       setErroComprimento(undefined);
-      const precoTotal = calcularPrecoPeca(num, parseInt(quantidade), peca.precoPorMetro);
+      const precoPorMetro = produtoConfig?.precoPorMetro || peca.precoPorMetro;
+      const precoTotal = calcularPrecoPeca(num, parseInt(quantidade), precoPorMetro, peca.servico);
       onUpdate({
         ...peca,
         comprimentoMm: num,
@@ -50,7 +52,8 @@ const PecaForm = ({ peca, index, onUpdate, onRemove, canRemove }: PecaFormProps)
     
     if (validacao.valido) {
       setErroQuantidade(undefined);
-      const precoTotal = calcularPrecoPeca(peca.comprimentoMm, num, peca.precoPorMetro);
+      const precoPorMetro = produtoConfig?.precoPorMetro || peca.precoPorMetro;
+      const precoTotal = calcularPrecoPeca(peca.comprimentoMm, num, precoPorMetro, peca.servico);
       onUpdate({
         ...peca,
         quantidade: num,
@@ -113,14 +116,14 @@ const PecaForm = ({ peca, index, onUpdate, onRemove, canRemove }: PecaFormProps)
               value={comprimento}
               onChange={(e) => handleComprimentoChange(e.target.value)}
               className={erroComprimento ? "border-destructive" : comprimentoValido ? "border-success" : ""}
-              placeholder={`Entre ${COMPRIMENTO_MIN} e ${COMPRIMENTO_MAX} mm`}
+              placeholder={`Entre ${produtoConfig?.minComprimentoMm || 1} e ${produtoConfig?.maxComprimentoMm || 3000} mm`}
             />
             {comprimentoValido && (
               <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-success" />
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            Min: {COMPRIMENTO_MIN} mm | Max: {COMPRIMENTO_MAX} mm | Tolerância: ±1 mm (até ±3 mm após corte)
+            Min: {produtoConfig?.minComprimentoMm || 1} mm | Max: {produtoConfig?.maxComprimentoMm || 3000} mm | Tolerância: {produtoConfig?.toleranciaCorte || "±1 mm (até ±3 mm após corte)"}
           </p>
           {erroComprimento && (
             <Alert variant="destructive">

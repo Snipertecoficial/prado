@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Plus, Loader2 } from "lucide-react";
-import { PecaPerfil2040, PRECO_POR_METRO_DEFAULT } from "@/types/product";
+import { PecaPerfil2040, PRODUTO_DEFAULT_CONFIG } from "@/types/product";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import PecaForm from "@/components/configurator/PecaForm";
@@ -76,11 +76,11 @@ const Product = () => {
   const [pecas, setPecas] = useState<PecaPerfil2040[]>([
     {
       id: crypto.randomUUID(),
-      comprimentoMm: 40,
+      comprimentoMm: PRODUTO_DEFAULT_CONFIG.minComprimentoMm,
       quantidade: 1,
       servico: "sem_servico",
-      precoPorMetro: PRECO_POR_METRO_DEFAULT,
-      precoTotalPeca: 3.96,
+      precoPorMetro: PRODUTO_DEFAULT_CONFIG.precoPorMetro,
+      precoTotalPeca: (PRODUTO_DEFAULT_CONFIG.minComprimentoMm / 1000) * PRODUTO_DEFAULT_CONFIG.precoPorMetro,
     },
   ]);
 
@@ -121,11 +121,11 @@ const Product = () => {
   const adicionarPeca = () => {
     const novaPeca: PecaPerfil2040 = {
       id: crypto.randomUUID(),
-      comprimentoMm: 40,
+      comprimentoMm: PRODUTO_DEFAULT_CONFIG.minComprimentoMm,
       quantidade: 1,
       servico: "sem_servico",
-      precoPorMetro: PRECO_POR_METRO_DEFAULT,
-      precoTotalPeca: 3.96,
+      precoPorMetro: PRODUTO_DEFAULT_CONFIG.precoPorMetro,
+      precoTotalPeca: (PRODUTO_DEFAULT_CONFIG.minComprimentoMm / 1000) * PRODUTO_DEFAULT_CONFIG.precoPorMetro,
     };
     setPecas([...pecas, novaPeca]);
   };
