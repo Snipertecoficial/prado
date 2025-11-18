@@ -50,7 +50,7 @@ export const SERVICOS_OPTIONS: { value: TipoServico; label: string }[] = [
   { value: "furo_conexao_capa_fechamento", label: "Furo p/ Conexão + Capa de Fechamento" },
 ];
 
-export const COMPRIMENTO_MIN = 40;
+export const COMPRIMENTO_MIN = 1;
 export const COMPRIMENTO_MAX = 3000;
 export const TOLERANCIA_CAMPO = 1;
 export const TOLERANCIA_CORTE = 3;

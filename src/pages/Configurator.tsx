@@ -14,22 +14,22 @@ const Configurator = () => {
   const [pecas, setPecas] = useState<PecaPerfil2040[]>([
     {
       id: crypto.randomUUID(),
-      comprimentoMm: 500,
+      comprimentoMm: 40,
       quantidade: 1,
       servico: "sem_servico",
       precoPorMetro: PRECO_POR_METRO_DEFAULT,
-      precoTotalPeca: 49.5,
+      precoTotalPeca: 3.96,
     },
   ]);
 
   const adicionarPeca = () => {
     const novaPeca: PecaPerfil2040 = {
       id: crypto.randomUUID(),
-      comprimentoMm: 500,
+      comprimentoMm: 40,
       quantidade: 1,
       servico: "sem_servico",
       precoPorMetro: PRECO_POR_METRO_DEFAULT,
-      precoTotalPeca: 49.5,
+      precoTotalPeca: 3.96,
     };
     setPecas([...pecas, novaPeca]);
   };

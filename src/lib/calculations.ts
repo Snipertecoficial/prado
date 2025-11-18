@@ -43,10 +43,10 @@ export function validarComprimento(
   if (isNaN(comprimento)) {
     return { valido: false, erro: "Por favor, insira um número válido" };
   }
-  if (comprimento < 40) {
+  if (comprimento < 1) {
     return {
       valido: false,
-      erro: "O comprimento mínimo é 40 mm",
+      erro: "O comprimento mínimo é 1 mm",
     };
   }
   if (comprimento > 3000) {
