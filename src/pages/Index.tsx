@@ -1,41 +1,83 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
-import { Product } from "@/types/product";
+import { storefrontApiRequest } from "@/lib/shopify";
+
+interface ShopifyProduct {
+  node: {
+    id: string;
+    title: string;
+    handle: string;
+    priceRange: {
+      minVariantPrice: {
+        amount: string;
+        currencyCode: string;
+      };
+    };
+    images: {
+      edges: Array<{
+        node: {
+          url: string;
+          altText: string | null;
+        };
+      }>;
+    };
+  };
+}
+
+const GET_PRODUCTS_QUERY = `
+  query GetProducts($first: Int!) {
+    products(first: $first) {
+      edges {
+        node {
+          id
+          title
+          handle
+          priceRange {
+            minVariantPrice {
+              amount
+              currencyCode
+            }
+          }
+          images(first: 1) {
+            edges {
+              node {
+                url
+                altText
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 const Index = () => {
   const navigate = useNavigate();
+  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const featuredProducts: Product[] = [
-    {
-      id: "1",
-      name: "PPW - PATINS COM ABA DE 25MM",
-      price: 128.0,
-      installmentPrice: 64.0,
-      installments: 2,
-      image: "/placeholder.svg",
-    },
-    {
-      id: "2",
-      name: "ROLAMENTO RÍGIDO DE ESFERAS 6900ZZ RADIAL",
-      price: 2.31,
-      image: "/placeholder.svg",
-    },
-    {
-      id: "3",
-      name: "FUSO DE ESFERA LAMINADO 25MM PASSO 10",
-      price: 2.21,
-      image: "/placeholder.svg",
-    },
-    {
-      id: "4",
-      name: "EIXO RETIFICADO E CROMADO 30MM",
-      price: 1.80,
-      image: "/placeholder.svg",
-    },
-  ];
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await storefrontApiRequest(GET_PRODUCTS_QUERY, { first: 10 });
+        if (data?.data?.products?.edges) {
+          setProducts(data.data.products.edges);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -60,13 +102,31 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onConfigure={() => navigate("/configurator")}
-              />
-            ))}
+            {loading ? (
+              <div className="col-span-full flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : products.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-muted-foreground">
+                  Nenhum produto encontrado. Crie produtos na sua loja Shopify.
+                </p>
+              </div>
+            ) : (
+              products.map((product) => (
+                <ProductCard
+                  key={product.node.id}
+                  product={{
+                    id: product.node.id,
+                    name: product.node.title,
+                    price: parseFloat(product.node.priceRange.minVariantPrice.amount),
+                    image: product.node.images.edges[0]?.node.url || "/placeholder.svg",
+                    handle: product.node.handle,
+                  }}
+                  onClick={() => navigate(`/product/${product.node.handle}`)}
+                />
+              ))
+            )}
           </div>
         </section>
 
@@ -81,7 +141,7 @@ const Index = () => {
                 Configuração Sob Medida
               </h3>
               <p className="text-sm">
-                Configure seus perfis de alumínio com comprimentos personalizados de 40mm a 3000mm. 
+                Configure seus perfis de alumínio com comprimentos personalizados de 1mm a 3000mm. 
                 Escolha entre diversos serviços de usinagem sem custo adicional.
               </p>
             </div>

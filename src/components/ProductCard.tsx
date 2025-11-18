@@ -1,16 +1,18 @@
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Product } from "@/types/product";
 import { formatarPreco } from "@/lib/calculations";
 
 interface ProductCardProps {
-  product: Product;
-  onConfigure?: () => void;
+  product: Product & { handle?: string };
+  onClick?: () => void;
 }
 
-const ProductCard = ({ product, onConfigure }: ProductCardProps) => {
+const ProductCard = ({ product, onClick }: ProductCardProps) => {
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card 
+      className="hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={onClick}
+    >
       <CardContent className="p-4">
         <div className="aspect-square relative mb-4 bg-muted rounded-lg overflow-hidden">
           <img
@@ -33,14 +35,6 @@ const ProductCard = ({ product, onConfigure }: ProductCardProps) => {
           )}
         </div>
       </CardContent>
-      <CardFooter className="p-4 pt-0">
-        <Button 
-          className="w-full bg-accent hover:bg-accent/90" 
-          onClick={onConfigure}
-        >
-          Configurar Produto
-        </Button>
-      </CardFooter>
     </Card>
   );
 };

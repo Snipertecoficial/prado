@@ -37,6 +37,7 @@ export interface Product {
   description?: string;
   installmentPrice?: number;
   installments?: number;
+  handle?: string;
 }
 
 export const SERVICOS_OPTIONS: { value: TipoServico; label: string }[] = [
