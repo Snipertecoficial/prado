@@ -1,12 +1,23 @@
-import { PecaPerfil2040 } from "@/types/product";
+import { PecaPerfil2040, ProdutoConfig, getServicoConfig } from "@/types/product";
 
 export function calcularPrecoPeca(
   comprimentoMm: number,
   quantidade: number,
-  precoPorMetro: number = 99.0
+  precoPorMetro: number = 99.0,
+  servicoId?: string
 ): number {
   const comprimentoM = comprimentoMm / 1000;
-  const total = comprimentoM * precoPorMetro * quantidade;
+  let precoBase = comprimentoM * precoPorMetro;
+  
+  // Adicionar custo extra do serviço, se houver
+  if (servicoId) {
+    const servicoConfig = getServicoConfig(servicoId as any);
+    if (servicoConfig) {
+      precoBase += servicoConfig.custoExtra;
+    }
+  }
+  
+  const total = precoBase * quantidade;
   return Number(total.toFixed(2));
 }
 
@@ -38,21 +49,25 @@ export function formatarPreco(valor: number): string {
 }
 
 export function validarComprimento(
-  comprimento: number
+  comprimento: number,
+  produtoConfig?: ProdutoConfig
 ): { valido: boolean; erro?: string } {
+  const min = produtoConfig?.minComprimentoMm || 1;
+  const max = produtoConfig?.maxComprimentoMm || 3000;
+  
   if (isNaN(comprimento)) {
     return { valido: false, erro: "Por favor, insira um número válido" };
   }
-  if (comprimento < 1) {
+  if (comprimento < min) {
     return {
       valido: false,
-      erro: "O comprimento mínimo é 1 mm",
+      erro: `O comprimento mínimo é ${min} mm`,
     };
   }
-  if (comprimento > 3000) {
+  if (comprimento > max) {
     return {
       valido: false,
-      erro: "O comprimento máximo é 3000 mm",
+      erro: `O comprimento máximo é ${max} mm`,
     };
   }
   return { valido: true };
