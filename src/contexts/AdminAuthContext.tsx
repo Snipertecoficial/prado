@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { verifyAdminSecret } from "@/lib/auth";
+import { verifyAdminSecret, verifyAdminCredentials } from "@/lib/auth";
 
 const STORAGE_KEY = "prado.admin.session";
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 8; // 8 hours
@@ -20,7 +20,7 @@ type AdminAuthContextValue = {
   initializing: boolean;
   isAuthenticated: boolean;
   sessionExpiresAt: number | null;
-  login: (secret: string) => Promise<void>;
+  login: (emailOrSecret: string, password?: string) => Promise<void>;
   logout: () => void;
 };
 
@@ -79,10 +79,19 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
     persistSession(session);
   }, [session]);
 
-  const login = async (secret: string) => {
-    const isValid = await verifyAdminSecret(secret);
+  const login = async (emailOrSecret: string, password?: string) => {
+    let isValid = false;
+
+    // If password is provided, use email + password authentication
+    if (password !== undefined) {
+      isValid = await verifyAdminCredentials(emailOrSecret, password);
+    } else {
+      // Otherwise, use the old secret-based authentication
+      isValid = await verifyAdminSecret(emailOrSecret);
+    }
+
     if (!isValid) {
-      throw new Error("Invalid admin secret");
+      throw new Error("Invalid admin credentials");
     }
 
     const newSession = createSession();
