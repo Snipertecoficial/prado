@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, ArrowLeft, Settings } from "lucide-react";
-import { PecaPerfil2040, ProdutoConfig, PRODUTO_DEFAULT_CONFIG } from "@/types/product";
+import { ArrowLeft, Loader2, Plus, Save, Settings } from "lucide-react";
+import { PecaPerfil2040, ProdutoConfig } from "@/types/product";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,25 +12,60 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import PecaForm from "@/components/configurator/PecaForm";
 import ResumoOrcamento from "@/components/configurator/ResumoOrcamento";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useShopifyProductConfig } from "@/hooks/useShopifyProductConfig";
+import { calcularPrecoPeca } from "@/lib/calculations";
 
 const Configurator = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  
-  // Estado para configuração do produto (admin)
-  const [produtoConfig, setProdutoConfig] = useState<ProdutoConfig>(PRODUTO_DEFAULT_CONFIG);
+  const {
+    products,
+    produtoConfig,
+    setProdutoConfig,
+    selectedProductId,
+    selectedVariantId,
+    isLoading,
+    isSaving,
+    handleSelectProduct,
+    handleCreateProduct,
+    handleSaveConfig,
+  } = useShopifyProductConfig();
   
   // Estado para as peças configuradas pelo cliente
-  const [pecas, setPecas] = useState<PecaPerfil2040[]>([
-    {
-      id: crypto.randomUUID(),
-      comprimentoMm: produtoConfig.minComprimentoMm,
-      quantidade: 1,
-      servico: "sem_servico",
-      precoPorMetro: produtoConfig.precoPorMetro,
-      precoTotalPeca: (produtoConfig.minComprimentoMm / 1000) * produtoConfig.precoPorMetro,
-    },
-  ]);
+  const [pecas, setPecas] = useState<PecaPerfil2040[]>([]);
+
+  useEffect(() => {
+    if (!pecas.length) {
+      setPecas([
+        {
+          id: crypto.randomUUID(),
+          comprimentoMm: produtoConfig.minComprimentoMm,
+          quantidade: 1,
+          servico: "sem_servico",
+          precoPorMetro: produtoConfig.precoPorMetro,
+          precoTotalPeca: (produtoConfig.minComprimentoMm / 1000) * produtoConfig.precoPorMetro,
+        },
+      ]);
+      return;
+    }
+
+    setPecas((prev) =>
+      prev.map((peca) => {
+        const precoTotalPeca = calcularPrecoPeca(
+          peca.comprimentoMm,
+          peca.quantidade,
+          produtoConfig.precoPorMetro,
+          peca.servico
+        );
+        return {
+          ...peca,
+          precoPorMetro: produtoConfig.precoPorMetro,
+          precoTotalPeca,
+        };
+      })
+    );
+  }, [pecas.length, produtoConfig.minComprimentoMm, produtoConfig.precoPorMetro]);
 
   const adicionarPeca = () => {
     const novaPeca: PecaPerfil2040 = {
@@ -56,19 +91,27 @@ const Configurator = () => {
     }
   };
 
-  const handleProdutoConfigChange = (campo: keyof ProdutoConfig, valor: any) => {
-    setProdutoConfig(prev => ({
-      ...prev,
-      [campo]: valor
-    }));
-    toast({
-      title: "Configuração atualizada",
-      description: `${campo} alterado com sucesso`,
+  const handleProdutoConfigChange = <K extends keyof ProdutoConfig>(
+    campo: K,
+    valor: ProdutoConfig[K]
+  ) => {
+    setProdutoConfig({
+      ...produtoConfig,
+      [campo]: valor,
     });
   };
 
-  // ID do variant do produto no Shopify (criado automaticamente)
-  const PRODUCT_VARIANT_ID = "gid://shopify/ProductVariant/51350863446327";
+  const handleSelectOrCreateProduct = async (value: string) => {
+    if (value === "new") {
+      await handleCreateProduct();
+      return;
+    }
+    await handleSelectProduct(value);
+  };
+
+  const handleSalvarConfiguracao = async () => {
+    await handleSaveConfig();
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -99,14 +142,67 @@ const Configurator = () => {
           <TabsContent value="configuracao" className="space-y-6">
             <Card className="p-6">
               <h2 className="text-2xl font-bold mb-6">Configurações do Produto</h2>
-              
+
               <div className="grid gap-6">
+                <div className="grid gap-4 md:grid-cols-3 items-end">
+                  <div className="grid gap-2 md:col-span-2">
+                    <Label>Produto na Shopify</Label>
+                    <Select
+                      value={selectedProductId || ""}
+                      onValueChange={handleSelectOrCreateProduct}
+                      disabled={isLoading || isSaving}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione ou crie um produto" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {products.map((produto) => (
+                          <SelectItem key={produto.id} value={produto.id}>
+                            {produto.title} {produto.variantPrice ? `— R$ ${produto.variantPrice}` : ""}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="new">+ Novo produto</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Selecione um produto existente ou crie um novo para salvar as configurações como metafields.
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2 justify-end">
+                    <Button
+                      variant="secondary"
+                      onClick={handleSalvarConfiguracao}
+                      disabled={isSaving || isLoading || !selectedProductId}
+                    >
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Salvando
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Salvar na Shopify
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                {selectedVariantId && (
+                  <div className="text-sm text-muted-foreground">
+                    Variant selecionado: <span className="font-semibold">{selectedVariantId}</span>
+                  </div>
+                )}
+
                 <div className="grid gap-2">
                   <Label htmlFor="nome">Nome do Produto</Label>
                   <Input
                     id="nome"
                     value={produtoConfig.nome}
                     onChange={(e) => handleProdutoConfigChange("nome", e.target.value)}
+                    disabled={isLoading || isSaving}
                   />
                 </div>
 
@@ -119,6 +215,7 @@ const Configurator = () => {
                       step="0.01"
                       value={produtoConfig.precoPorMetro}
                       onChange={(e) => handleProdutoConfigChange("precoPorMetro", parseFloat(e.target.value))}
+                      disabled={isLoading || isSaving}
                     />
                   </div>
 
@@ -130,6 +227,7 @@ const Configurator = () => {
                       step="0.001"
                       value={produtoConfig.pesoPorMetroKg || 0}
                       onChange={(e) => handleProdutoConfigChange("pesoPorMetroKg", parseFloat(e.target.value))}
+                      disabled={isLoading || isSaving}
                     />
                   </div>
                 </div>
@@ -142,6 +240,7 @@ const Configurator = () => {
                       type="number"
                       value={produtoConfig.minComprimentoMm}
                       onChange={(e) => handleProdutoConfigChange("minComprimentoMm", parseInt(e.target.value))}
+                      disabled={isLoading || isSaving}
                     />
                   </div>
 
@@ -152,6 +251,7 @@ const Configurator = () => {
                       type="number"
                       value={produtoConfig.maxComprimentoMm}
                       onChange={(e) => handleProdutoConfigChange("maxComprimentoMm", parseInt(e.target.value))}
+                      disabled={isLoading || isSaving}
                     />
                   </div>
 
@@ -162,6 +262,7 @@ const Configurator = () => {
                       type="number"
                       value={produtoConfig.comprimentoBarraMm}
                       onChange={(e) => handleProdutoConfigChange("comprimentoBarraMm", parseInt(e.target.value))}
+                      disabled={isLoading || isSaving}
                     />
                   </div>
                 </div>
@@ -172,6 +273,7 @@ const Configurator = () => {
                     id="toleranciaCorte"
                     value={produtoConfig.toleranciaCorte}
                     onChange={(e) => handleProdutoConfigChange("toleranciaCorte", e.target.value)}
+                    disabled={isLoading || isSaving}
                   />
                 </div>
 
@@ -182,6 +284,7 @@ const Configurator = () => {
                     value={produtoConfig.descricaoTecnica || ""}
                     onChange={(e) => handleProdutoConfigChange("descricaoTecnica", e.target.value)}
                     rows={4}
+                    disabled={isLoading || isSaving}
                   />
                 </div>
 
@@ -236,7 +339,7 @@ const Configurator = () => {
 
               <ResumoOrcamento
                 pecas={pecas}
-                productVariantId={PRODUCT_VARIANT_ID}
+                productVariantId={selectedVariantId}
                 produtoConfig={produtoConfig}
               />
             </Card>
