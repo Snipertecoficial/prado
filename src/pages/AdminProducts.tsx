@@ -17,6 +17,7 @@ import {
   updateAdminProduct,
   updateProductMedia,
 } from "@/lib/shopify-admin";
+import { MAX_FILE_SIZE, ALLOWED_IMAGE_TYPES } from "@/lib/constants";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -64,6 +65,8 @@ const AdminProducts = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [products, setProducts] = useState<AdminProductSummary[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [collections, setCollections] = useState<AdminCollection[]>([]);
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
@@ -81,6 +84,16 @@ const AdminProducts = () => {
   const [uploadStatuses, setUploadStatuses] = useState<UploadStatus[]>([]);
 
   const orderedMedia = useMemo(() => [...mediaItems].sort((a, b) => a.position - b.position), [mediaItems]);
+
+  // Filter products based on search query and status
+  const filteredProducts = useMemo(() => {
+    return products.filter(prod => {
+      const matchesSearch = prod.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           prod.handle.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === "ALL" || prod.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [products, searchQuery, statusFilter]);
 
   const loadProducts = useCallback(async () => {
     try {
@@ -315,6 +328,32 @@ const AdminProducts = () => {
     const selectedFiles = files ? Array.from(files) : Array.from(fileInputRef.current?.files || []);
     if (!selectedFiles.length) return;
 
+    // Validate file types and sizes
+    const invalidFiles = selectedFiles.filter(file => {
+      const isValidType = ALLOWED_IMAGE_TYPES.includes(file.type);
+      const isValidSize = file.size <= MAX_FILE_SIZE;
+      return !isValidType || !isValidSize;
+    });
+
+    if (invalidFiles.length > 0) {
+      const messages = invalidFiles.map(file => {
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+          return `${file.name}: tipo de arquivo inválido`;
+        }
+        if (file.size > MAX_FILE_SIZE) {
+          return `${file.name}: arquivo muito grande (máximo 10MB)`;
+        }
+        return file.name;
+      });
+      
+      toast({
+        variant: "destructive",
+        title: "Arquivos inválidos",
+        description: messages.join(', '),
+      });
+      return;
+    }
+
     const initialStatuses: UploadStatus[] = selectedFiles.map(file => ({
       fileName: file.name,
       state: "pending",
@@ -495,19 +534,55 @@ const AdminProducts = () => {
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Label className="text-sm text-muted-foreground">Selecionar produto</Label>
-                <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
-                  {products.map(prod => (
-                    <Button
-                      key={prod.id}
-                      variant={prod.id === selectedProductId ? "secondary" : "outline"}
-                      className="w-full justify-between"
-                      onClick={() => handleSelectProduct(prod.id)}
-                    >
-                      <span className="text-left truncate">{prod.title}</span>
-                      <Badge variant={prod.status === "ACTIVE" ? "default" : "outline"}>{prod.status}</Badge>
-                    </Button>
-                  ))}
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">Buscar produto</Label>
+                  <Input
+                    placeholder="Nome ou handle..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground">Filtrar por status</Label>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">Todos</SelectItem>
+                      <SelectItem value="ACTIVE">Ativos</SelectItem>
+                      <SelectItem value="DRAFT">Rascunhos</SelectItem>
+                      <SelectItem value="ARCHIVED">Arquivados</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Separator />
+                
+                <div>
+                  <Label className="text-sm text-muted-foreground">
+                    Produtos ({filteredProducts.length})
+                  </Label>
+                  <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1 mt-2">
+                    {filteredProducts.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        Nenhum produto encontrado
+                      </p>
+                    ) : (
+                      filteredProducts.map(prod => (
+                        <Button
+                          key={prod.id}
+                          variant={prod.id === selectedProductId ? "secondary" : "outline"}
+                          className="w-full justify-between"
+                          onClick={() => handleSelectProduct(prod.id)}
+                        >
+                          <span className="text-left truncate">{prod.title}</span>
+                          <Badge variant={prod.status === "ACTIVE" ? "default" : "outline"}>{prod.status}</Badge>
+                        </Button>
+                      ))
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>

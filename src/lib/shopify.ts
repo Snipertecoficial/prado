@@ -1,4 +1,4 @@
-// Shopify Storefront API Configuration (namespaced to avoid collisions)
+// Shopify Storefront API Configuration
 export const SHOPIFY_STORE_DOMAIN =
   import.meta.env.VITE_SHOPIFY_DOMAIN || "lovable-project-969u3.myshopify.com";
 const STOREFRONT_ACCESS_TOKEN =
@@ -6,24 +6,6 @@ const STOREFRONT_ACCESS_TOKEN =
 export const SHOPIFY_API_VERSION = import.meta.env.VITE_SHOPIFY_API_VERSION || "2024-07";
 
 const STOREFRONT_API_URL = `https://${SHOPIFY_STORE_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
-// Shopify Storefront API Configuration
-export const SHOPIFY_DOMAIN = import.meta.env.VITE_SHOPIFY_DOMAIN;
-const STOREFRONT_ACCESS_TOKEN = import.meta.env.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN;
-export const SHOPIFY_API_VERSION = import.meta.env.VITE_SHOPIFY_API_VERSION;
-
-function assertShopifyConfig() {
-  const missingVars = [
-    SHOPIFY_DOMAIN ? null : 'VITE_SHOPIFY_DOMAIN',
-    STOREFRONT_ACCESS_TOKEN ? null : 'VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN',
-    SHOPIFY_API_VERSION ? null : 'VITE_SHOPIFY_API_VERSION',
-  ].filter((value): value is string => Boolean(value));
-
-  if (missingVars.length > 0) {
-    throw new Error(
-      `Missing Shopify configuration: ${missingVars.join(', ')} must be set in your environment.`,
-    );
-  }
-}
 
 export interface ShopifyProduct {
   node: {
@@ -87,11 +69,6 @@ export async function storefrontApiRequest(query: string, variables: Record<stri
   }
 
   const response = await fetch(STOREFRONT_API_URL, {
-  assertShopifyConfig();
-
-  const storefrontApiUrl = `https://${SHOPIFY_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
-
-  const response = await fetch(storefrontApiUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
