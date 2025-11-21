@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Plus, Loader2 } from "lucide-react";
@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import PecaForm from "@/components/configurator/PecaForm";
 import ResumoOrcamento from "@/components/configurator/ResumoOrcamento";
 import { storefrontApiRequest } from "@/lib/shopify";
+import ProductGallery from "@/components/ProductGallery";
 
 interface ShopifyProductData {
   id: string;
@@ -55,7 +56,7 @@ const GET_PRODUCT_BY_HANDLE = `
           }
         }
       }
-      images(first: 5) {
+      images(first: 20) {
         edges {
           node {
             url
@@ -83,6 +84,11 @@ const Product = () => {
       precoTotalPeca: (PRODUTO_DEFAULT_CONFIG.minComprimentoMm / 1000) * PRODUTO_DEFAULT_CONFIG.precoPorMetro,
     },
   ]);
+
+  const galleryImages = useMemo(
+    () => product?.images?.edges?.map(edge => edge.node) ?? [],
+    [product?.images?.edges],
+  );
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -158,7 +164,6 @@ const Product = () => {
   }
 
   const productVariantId = product.variants.edges[0]?.node.id;
-  const mainImage = product.images.edges[0]?.node.url;
 
   return (
     <div className="min-h-screen bg-background">
@@ -178,19 +183,7 @@ const Product = () => {
         {/* Product Header with Image */}
         <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Product Image */}
-          <div className="bg-muted rounded-lg p-8 flex items-center justify-center">
-            {mainImage ? (
-              <img
-                src={mainImage}
-                alt={product.title}
-                className="max-h-96 w-auto object-contain"
-              />
-            ) : (
-              <div className="h-96 flex items-center justify-center text-muted-foreground">
-                Sem imagem disponível
-              </div>
-            )}
-          </div>
+          <ProductGallery images={galleryImages} />
 
           {/* Product Info */}
           <div className="flex flex-col justify-center">
