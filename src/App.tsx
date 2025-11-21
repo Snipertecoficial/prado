@@ -11,10 +11,6 @@ import AdminProducts from "./pages/AdminProducts";
 import Category from "./pages/Category";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import AdminMedia from "./pages/AdminMedia";
-import AdminProducts from "./pages/AdminProducts";
-import AdminLogin from "./pages/AdminLogin";
-import AdminGuard from "./components/AdminGuard";
 import Product from "./pages/Product";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -26,26 +22,18 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/product/:handle" element={<Product />} />
-          <Route path="/categoria/:categorySlug" element={<Category />} />
-          <Route path="/categoria/:categorySlug/:subcategorySlug" element={<Category />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/configurator" element={<AdminGuard><Configurator /></AdminGuard>} />
-          <Route path="/admin/products" element={<AdminGuard><AdminProducts /></AdminGuard>} />
-          <Route path="/admin/media" element={<AdminGuard><AdminMedia /></AdminGuard>} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
         <AdminAuthProvider>
           <Routes>
+            {/* Public routes */}
             <Route path="/" element={<Index />} />
             <Route path="/product/:handle" element={<Product />} />
             <Route path="/categoria/:categorySlug" element={<Category />} />
             <Route path="/categoria/:categorySlug/:subcategorySlug" element={<Category />} />
+            
+            {/* Admin login (public) */}
             <Route path="/admin/login" element={<AdminLogin />} />
 
+            {/* Protected admin routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/admin/configurator" element={<Configurator />} />
               <Route path="/admin/products" element={<AdminProducts />} />

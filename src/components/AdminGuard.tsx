@@ -1,16 +1,16 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/lib/admin-auth";
+import { useAdminAuth } from "@/contexts/AdminAuthContext";
 
 interface AdminGuardProps {
   children: JSX.Element;
 }
 
 const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAdminAuth();
   const location = useLocation();
 
   if (!isAuthenticated) {
-    return <Navigate to="/admin/login" state={{ from: location }} replace />;
+    return <Navigate to="/admin/login" state={{ from: location.pathname }} replace />;
   }
 
   return children;
