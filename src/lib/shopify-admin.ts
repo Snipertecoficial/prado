@@ -1,3 +1,6 @@
+import { SHOPIFY_API_VERSION, SHOPIFY_STORE_DOMAIN } from "./shopify";
+
+const ADMIN_API_URL = `https://${SHOPIFY_STORE_DOMAIN}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`;
 import { SHOPIFY_API_VERSION, SHOPIFY_DOMAIN } from "./shopify";
 
 const ADMIN_API_URL = `https://${SHOPIFY_DOMAIN}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`;
