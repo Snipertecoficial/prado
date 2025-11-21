@@ -1,55 +1,56 @@
 // Produtos em destaque para a home (baseado no PDF)
 export const FEATURED_PRODUCTS = [
   {
-    name: "ROLAMENTO RÍGIDO DE ESFERAS 6900ZZ RADIAL",
-    price: 129.59,
-    handle: "rolamento-rigido-esferas-6900zz-radial",
-    category: "rolamento-radial",
+    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
+    price: 99.00,
+    pricePerMeter: true,
+    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
+    category: "perfil-estrutural",
   },
   {
-    name: "FUSO DE ESFERA LAMINADO 25MM PASSO 10",
-    price: 1.80,
+    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
+    price: 99.00,
     pricePerMeter: true,
-    handle: "fuso-esfera-laminado-25mm-passo-10",
-    category: "fuso-esferas",
+    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
+    category: "perfil-estrutural",
   },
   {
-    name: "EIXO RETIFICADO E CROMADO 30MM",
-    price: 2.31,
+    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
+    price: 99.00,
     pricePerMeter: true,
-    handle: "eixo-retificado-cromado-30mm",
-    category: "eixos-pillow",
+    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
+    category: "perfil-estrutural",
   }
 ];
 
 // Mais vendidos (baseado no PDF)
 export const BEST_SELLERS = [
   {
-    name: "GLP - GUIA LINEAR DE 20MM",
-    price: 2.00,
+    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
+    price: 99.00,
     pricePerMeter: true,
-    handle: "glp-guia-linear-20mm",
-    category: "guia-linear-patins",
+    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
+    category: "perfil-estrutural",
   },
   {
-    name: "EIXO DE 16MM COM SUPORTE T",
-    price: 1.50,
+    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
+    price: 99.00,
     pricePerMeter: true,
-    handle: "eixo-16mm-suporte-t",
-    category: "eixos-pillow",
+    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
+    category: "perfil-estrutural",
   },
   {
-    name: "EIXO DE 20MM COM SUPORTE T",
-    price: 1.60,
+    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
+    price: 99.00,
     pricePerMeter: true,
-    handle: "eixo-20mm-suporte-t",
-    category: "eixos-pillow",
+    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
+    category: "perfil-estrutural",
   },
   {
-    name: "GLP - GUIA LINEAR DE 15MM",
-    price: 1.80,
+    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
+    price: 99.00,
     pricePerMeter: true,
-    handle: "glp-guia-linear-15mm",
-    category: "guia-linear-patins",
+    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
+    category: "perfil-estrutural",
   }
 ];
