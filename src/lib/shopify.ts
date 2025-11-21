@@ -1,9 +1,11 @@
 // Shopify Storefront API Configuration
-const SHOPIFY_DOMAIN = 'lovable-project-969u3.myshopify.com';
-const STOREFRONT_ACCESS_TOKEN = '61a24389861a98e0d01e2290d3f4eb8f';
-const API_VERSION = '2025-07';
+export const SHOPIFY_DOMAIN =
+  import.meta.env.VITE_SHOPIFY_DOMAIN || "lovable-project-969u3.myshopify.com";
+const STOREFRONT_ACCESS_TOKEN =
+  import.meta.env.VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN || "61a24389861a98e0d01e2290d3f4eb8f";
+export const SHOPIFY_API_VERSION = import.meta.env.VITE_SHOPIFY_API_VERSION || "2024-07";
 
-const STOREFRONT_API_URL = `https://${SHOPIFY_DOMAIN}/api/${API_VERSION}/graphql.json`;
+const STOREFRONT_API_URL = `https://${SHOPIFY_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
 
 export interface ShopifyProduct {
   node: {
@@ -59,7 +61,13 @@ export interface CartItem {
 }
 
 // Storefront API request function
-export async function storefrontApiRequest(query: string, variables: any = {}) {
+export async function storefrontApiRequest(query: string, variables: Record<string, unknown> = {}) {
+  if (!SHOPIFY_DOMAIN || !STOREFRONT_ACCESS_TOKEN) {
+    throw new Error(
+      "Configuração da Shopify ausente. Defina VITE_SHOPIFY_DOMAIN e VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN.",
+    );
+  }
+
   const response = await fetch(STOREFRONT_API_URL, {
     method: 'POST',
     headers: {
@@ -134,8 +142,11 @@ export async function createStorefrontCheckout(items: CartItem[]): Promise<strin
       },
     });
 
-    if (cartData.data.cartCreate.userErrors.length > 0) {
-      throw new Error(`Cart creation failed: ${cartData.data.cartCreate.userErrors.map((e: any) => e.message).join(', ')}`);
+    const userErrors = cartData.data.cartCreate
+      .userErrors as Array<{ message: string }>;
+
+    if (userErrors.length > 0) {
+      throw new Error(`Cart creation failed: ${userErrors.map(error => error.message).join(', ')}`);
     }
 
     const cart = cartData.data.cartCreate.cart;
