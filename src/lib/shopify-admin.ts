@@ -49,8 +49,6 @@ export async function adminApiRequest<T>(query: string, variables: Record<string
     );
   }
 
-  const ADMIN_API_URL = `https://${SHOPIFY_DOMAIN}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`;
-
   const response = await fetch(ADMIN_API_URL, {
     method: "POST",
     headers: {

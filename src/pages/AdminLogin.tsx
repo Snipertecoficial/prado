@@ -24,7 +24,7 @@ const AdminLogin = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Redirecionar se já estiver logado
+  // Redirect if already logged in
   const state = (location.state as { from?: string; message?: string } | null) || {};
   const redirectPath = state.from || "/admin/products";
 
@@ -41,7 +41,7 @@ const AdminLogin = () => {
 
     try {
       await login(secret);
-      // Login bem-sucedido redirecionará via useEffect
+      // Successful login will redirect via useEffect
     } catch (authError) {
       console.error(authError);
       setError("Credencial inválida. Acesso negado.");
