@@ -64,10 +64,12 @@ The admin area (`/admin/*` routes) is protected by password authentication using
 
 3. When logging in to `/admin/login`, use your actual password (not the hash).
 
-**Security Notes:**
+**⚠️ Security Notes:**
+- **CRITICAL:** Never use the example password/hash from `.env.example` in production!
 - Never commit your `.env` file or expose your password
-- The hash in `.env.example` is just an example - always use your own
+- Always generate your own unique, strong password and its hash
 - Admin sessions are stored locally and expire after 8 hours
+- The default hash in the code is intentionally not documented - you MUST set your own via environment variable
 
 **Edit a file directly in GitHub**
 
