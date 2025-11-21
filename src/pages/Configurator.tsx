@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, ArrowLeft, Settings } from "lucide-react";
+import { Plus, ArrowLeft, Settings, Loader2 } from "lucide-react";
 import { PecaPerfil2040, ProdutoConfig, PRODUTO_DEFAULT_CONFIG } from "@/types/product";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,27 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import PecaForm from "@/components/configurator/PecaForm";
 import ResumoOrcamento from "@/components/configurator/ResumoOrcamento";
+import { storefrontApiRequest } from "@/lib/shopify";
+import ProductGallery from "@/components/ProductGallery";
+
+const GET_CLIENT_VIEW_PRODUCT = `
+  query GetProductByHandle($handle: String!) {
+    productByHandle(handle: $handle) {
+      id
+      title
+      images(first: 20) {
+        edges {
+          node {
+            url
+            altText
+          }
+        }
+      }
+    }
+  }
+`;
+
+const DEFAULT_CLIENT_PRODUCT_HANDLE = "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6";
 
 const Configurator = () => {
   const { toast } = useToast();
@@ -31,6 +52,9 @@ const Configurator = () => {
       precoTotalPeca: (produtoConfig.minComprimentoMm / 1000) * produtoConfig.precoPorMetro,
     },
   ]);
+
+  const [clientViewImages, setClientViewImages] = useState<{ url: string; altText: string | null }[]>([]);
+  const [clientViewLoading, setClientViewLoading] = useState(false);
 
   const adicionarPeca = () => {
     const novaPeca: PecaPerfil2040 = {
@@ -56,7 +80,35 @@ const Configurator = () => {
     }
   };
 
-  const handleProdutoConfigChange = (campo: keyof ProdutoConfig, valor: any) => {
+  useEffect(() => {
+    const loadClientProduct = async () => {
+      try {
+        setClientViewLoading(true);
+        const response = await storefrontApiRequest(GET_CLIENT_VIEW_PRODUCT, {
+          handle: DEFAULT_CLIENT_PRODUCT_HANDLE,
+        });
+
+        const edges = (response?.data?.productByHandle?.images?.edges as Array<{ node: { url: string; altText: string | null } }> | undefined) ?? [];
+        setClientViewImages(edges.map(edge => edge.node));
+      } catch (error) {
+        console.error("Erro ao buscar imagens para a visão do cliente", error);
+        toast({
+          variant: "destructive",
+          title: "Erro ao carregar galeria",
+          description: "Não foi possível carregar as imagens do produto.",
+        });
+      } finally {
+        setClientViewLoading(false);
+      }
+    };
+
+    loadClientProduct();
+  }, [toast]);
+
+  const handleProdutoConfigChange = (
+    campo: keyof ProdutoConfig,
+    valor: ProdutoConfig[keyof ProdutoConfig],
+  ) => {
     setProdutoConfig(prev => ({
       ...prev,
       [campo]: valor
@@ -205,6 +257,15 @@ const Configurator = () => {
                 <p className="text-muted-foreground">Preço: R$ {produtoConfig.precoPorMetro.toFixed(2)}/m</p>
                 <p className="text-sm text-muted-foreground">{produtoConfig.toleranciaCorte}</p>
               </div>
+
+              {clientViewLoading ? (
+                <div className="flex items-center gap-2 text-muted-foreground mb-6">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Carregando galeria do produto...
+                </div>
+              ) : (
+                <ProductGallery images={clientViewImages} className="mb-8" />
+              )}
 
               {/* Formulários das Peças */}
               <div className="space-y-6">
