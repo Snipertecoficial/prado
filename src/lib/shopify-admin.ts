@@ -1,7 +1,6 @@
-import { SHOPIFY_API_VERSION, SHOPIFY_STORE_DOMAIN } from "./shopify";
-
-const ADMIN_API_URL = `https://${SHOPIFY_STORE_DOMAIN}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`;
 import { SHOPIFY_API_VERSION, SHOPIFY_DOMAIN } from "./shopify";
+
+const ADMIN_API_URL = `https://${SHOPIFY_DOMAIN}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`;
 
 const ADMIN_ACCESS_TOKEN = import.meta.env.VITE_SHOPIFY_ADMIN_API_TOKEN || "";
 
@@ -49,8 +48,6 @@ export async function adminApiRequest<T>(query: string, variables: Record<string
       "Configuração da Shopify ausente. Defina VITE_SHOPIFY_DOMAIN e VITE_SHOPIFY_API_VERSION.",
     );
   }
-
-  const ADMIN_API_URL = `https://${SHOPIFY_DOMAIN}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`;
 
   const response = await fetch(ADMIN_API_URL, {
     method: "POST",
