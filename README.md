@@ -66,9 +66,10 @@ The admin area (`/admin/*` routes) is protected by password authentication using
 
 **⚠️ Security Notes:**
 - The password is hashed client-side using SHA-256 before comparison
-- Never commit your `.env` file or expose your password hash
+- **CRITICAL:** Change the default password immediately in production environments
+- Never commit your `.env` file or share your password hash publicly
 - Admin sessions are stored locally and expire after 8 hours
-- Change the default password in production for security
+- The default configuration is for development only and must be changed for production use
 
 **Edit a file directly in GitHub**
 
