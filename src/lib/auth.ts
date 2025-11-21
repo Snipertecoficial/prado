@@ -42,6 +42,7 @@ export const verifyAdminCredentials = async (email: string, password: string) =>
   const passwordHash = await hashSecret(password);
 
   // Check if email and password hash match the configured admin credentials
+  // Note: Email comparison is case-insensitive, but hash comparison is case-sensitive
   return email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() && 
-         passwordHash === ADMIN_PASSWORD_HASH.toLowerCase();
+         passwordHash === ADMIN_PASSWORD_HASH.trim();
 };
