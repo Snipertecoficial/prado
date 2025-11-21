@@ -8,28 +8,61 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, Phone, Mail } from "lucide-react";
 import { storefrontApiRequest, ShopifyProduct } from "@/lib/shopify";
-import { FEATURED_PRODUCTS, BEST_SELLERS } from "@/data/featured-products";
+import {
+  BEST_SELLERS_COLLECTION_HANDLE,
+  FEATURED_COLLECTION_HANDLE,
+} from "@/data/featured-products";
 
-const GET_PRODUCTS_QUERY = `
-  query getProducts($first: Int!) {
-    products(first: $first) {
-      edges {
-        node {
-          id
-          title
-          description
-          handle
-          priceRange {
-            minVariantPrice {
-              amount
-              currencyCode
+const GET_CURATED_PRODUCTS_QUERY = `
+  query getCuratedProducts($featuredHandle: String!, $bestSellersHandle: String!, $first: Int!) {
+    featured: collectionByHandle(handle: $featuredHandle) {
+      title
+      products(first: $first) {
+        edges {
+          node {
+            id
+            title
+            description
+            handle
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+            images(first: 1) {
+              edges {
+                node {
+                  url
+                  altText
+                }
+              }
             }
           }
-          images(first: 1) {
-            edges {
-              node {
-                url
-                altText
+        }
+      }
+    }
+    bestSellers: collectionByHandle(handle: $bestSellersHandle) {
+      title
+      products(first: $first) {
+        edges {
+          node {
+            id
+            title
+            description
+            handle
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+            images(first: 1) {
+              edges {
+                node {
+                  url
+                  altText
+                }
               }
             }
           }
@@ -41,14 +74,35 @@ const GET_PRODUCTS_QUERY = `
 
 export default function Index() {
   const navigate = useNavigate();
-  const [allProducts, setAllProducts] = useState<ShopifyProduct[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<ShopifyProduct[]>([]);
+  const [bestSellerProducts, setBestSellerProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const data = await storefrontApiRequest(GET_PRODUCTS_QUERY, { first: 20 });
-        setAllProducts(data.data.products.edges);
+        const data = await storefrontApiRequest(GET_CURATED_PRODUCTS_QUERY, {
+          featuredHandle: FEATURED_COLLECTION_HANDLE,
+          bestSellersHandle: BEST_SELLERS_COLLECTION_HANDLE,
+          first: 8,
+        });
+
+        const uniqueByHandle = (products: ShopifyProduct[]) => {
+          const seen = new Set<string>();
+          return products.filter((product) => {
+            const handle = product.node.handle;
+            if (seen.has(handle)) return false;
+            seen.add(handle);
+            return true;
+          });
+        };
+
+        setFeaturedProducts(
+          uniqueByHandle(data.data.featured?.products.edges || []),
+        );
+        setBestSellerProducts(
+          uniqueByHandle(data.data.bestSellers?.products.edges || []),
+        );
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
@@ -59,44 +113,33 @@ export default function Index() {
     fetchProducts();
   }, []);
 
-  // Função auxiliar para encontrar produto por handle
-  const findProductByHandle = (handle: string) => {
-    return allProducts.find(p => p.node.handle === handle);
-  };
-
   // Renderizar produto individual
-  const renderProduct = (productData: typeof FEATURED_PRODUCTS[0], index: number) => {
-    if (loading) {
-      return (
-        <div key={index} className="space-y-3">
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-        </div>
-      );
-    }
+  const renderProduct = (product: ShopifyProduct) => (
+    <div
+      key={product.node.id}
+      onClick={() => navigate(`/product/${product.node.handle}`)}
+      className="cursor-pointer"
+    >
+      <ProductCard
+        product={{
+          id: product.node.id,
+          name: product.node.title,
+          price: parseFloat(product.node.priceRange.minVariantPrice.amount),
+          image: product.node.images.edges[0]?.node.url || "/placeholder.svg",
+          handle: product.node.handle,
+        }}
+      />
+    </div>
+  );
 
-    const shopifyProduct = findProductByHandle(productData.handle);
-    if (!shopifyProduct) return null;
-
-    return (
-      <div 
-        key={productData.handle}
-        onClick={() => navigate(`/product/${productData.handle}`)}
-        className="cursor-pointer"
-      >
-        <ProductCard
-          product={{
-            id: shopifyProduct.node.id,
-            name: shopifyProduct.node.title,
-            price: parseFloat(shopifyProduct.node.priceRange.minVariantPrice.amount),
-            image: shopifyProduct.node.images.edges[0]?.node.url || "/placeholder.svg",
-            handle: shopifyProduct.node.handle
-          }}
-        />
+  const renderSkeletons = (count: number) =>
+    Array.from({ length: count }).map((_, index) => (
+      <div key={`skeleton-${index}`} className="space-y-3">
+        <Skeleton className="h-48 w-full" />
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
       </div>
-    );
-  };
+    ));
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -125,7 +168,14 @@ export default function Index() {
               Produtos em Destaque
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              {FEATURED_PRODUCTS.map((product, index) => renderProduct(product, index))}
+              {loading && renderSkeletons(3)}
+              {!loading && featuredProducts.length > 0 &&
+                featuredProducts.map((product) => renderProduct(product))}
+              {!loading && featuredProducts.length === 0 && (
+                <div className="col-span-full text-center text-muted-foreground">
+                  Nenhum produto em destaque disponível no momento.
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -137,7 +187,14 @@ export default function Index() {
               Mais Vendidos
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              {BEST_SELLERS.map((product, index) => renderProduct(product, index))}
+              {loading && renderSkeletons(4)}
+              {!loading && bestSellerProducts.length > 0 &&
+                bestSellerProducts.map((product) => renderProduct(product))}
+              {!loading && bestSellerProducts.length === 0 && (
+                <div className="col-span-full text-center text-muted-foreground">
+                  Ainda não há produtos mais vendidos disponíveis.
+                </div>
+              )}
             </div>
           </div>
         </section>

@@ -1,56 +1,9 @@
-// Produtos em destaque para a home (baseado no PDF)
-export const FEATURED_PRODUCTS = [
-  {
-    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
-    price: 99.00,
-    pricePerMeter: true,
-    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
-    category: "perfil-estrutural",
-  },
-  {
-    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
-    price: 99.00,
-    pricePerMeter: true,
-    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
-    category: "perfil-estrutural",
-  },
-  {
-    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
-    price: 99.00,
-    pricePerMeter: true,
-    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
-    category: "perfil-estrutural",
-  }
-];
+const FEATURED_COLLECTION_FALLBACK = "featured";
+const BEST_SELLERS_COLLECTION_FALLBACK = "best-sellers";
 
-// Mais vendidos (baseado no PDF)
-export const BEST_SELLERS = [
-  {
-    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
-    price: 99.00,
-    pricePerMeter: true,
-    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
-    category: "perfil-estrutural",
-  },
-  {
-    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
-    price: 99.00,
-    pricePerMeter: true,
-    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
-    category: "perfil-estrutural",
-  },
-  {
-    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
-    price: 99.00,
-    pricePerMeter: true,
-    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
-    category: "perfil-estrutural",
-  },
-  {
-    name: "Perfil Estrutural em Alumínio 20x40 V-Slot Preto - Canal 6",
-    price: 99.00,
-    pricePerMeter: true,
-    handle: "perfil-estrutural-em-aluminio-20x40-v-slot-preto-canal-6",
-    category: "perfil-estrutural",
-  }
-];
+export const FEATURED_COLLECTION_HANDLE =
+  import.meta.env.VITE_SHOPIFY_FEATURED_COLLECTION_HANDLE || FEATURED_COLLECTION_FALLBACK;
+
+export const BEST_SELLERS_COLLECTION_HANDLE =
+  import.meta.env.VITE_SHOPIFY_BEST_SELLERS_COLLECTION_HANDLE ||
+  BEST_SELLERS_COLLECTION_FALLBACK;
