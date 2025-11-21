@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Shield, ShieldAlert, ShieldCheck } from "lucide-react";
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +26,7 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
 
   const state = (location.state as { from?: string; message?: string } | null) || {};
-  const redirectPath = state.from || "/admin/products";
+  const redirectPath = state.from || "/admin/dashboard";
 
   useEffect(() => {
     if (!initializing && isAuthenticated) {

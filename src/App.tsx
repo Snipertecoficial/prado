@@ -6,8 +6,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Configurator from "./pages/Configurator";
 import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 import AdminMedia from "./pages/AdminMedia";
 import AdminProducts from "./pages/AdminProducts";
+import AdminSettings from "./pages/AdminSettings";
 import Category from "./pages/Category";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -35,9 +37,11 @@ const App = () => (
 
             {/* Protected admin routes */}
             <Route element={<ProtectedRoute />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/configurator" element={<Configurator />} />
               <Route path="/admin/products" element={<AdminProducts />} />
               <Route path="/admin/media" element={<AdminMedia />} />
+              <Route path="/admin/settings" element={<AdminSettings />} />
             </Route>
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
