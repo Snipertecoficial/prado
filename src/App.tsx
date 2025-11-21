@@ -26,12 +26,16 @@ const App = () => (
       <BrowserRouter>
         <AdminAuthProvider>
           <Routes>
+            {/* Public routes */}
             <Route path="/" element={<Index />} />
             <Route path="/product/:handle" element={<Product />} />
             <Route path="/categoria/:categorySlug" element={<Category />} />
             <Route path="/categoria/:categorySlug/:subcategorySlug" element={<Category />} />
+            
+            {/* Admin login (public) */}
             <Route path="/admin/login" element={<AdminLogin />} />
 
+            {/* Protected admin routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/configurator" element={<Configurator />} />
