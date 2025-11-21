@@ -1,40 +1,23 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
-import ProductCard from "@/components/ProductCard";
-import { storefrontApiRequest } from "@/lib/shopify";
-
-interface ShopifyProduct {
-  node: {
-    id: string;
-    title: string;
-    handle: string;
-    priceRange: {
-      minVariantPrice: {
-        amount: string;
-        currencyCode: string;
-      };
-    };
-    images: {
-      edges: Array<{
-        node: {
-          url: string;
-          altText: string | null;
-        };
-      }>;
-    };
-  };
-}
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { ProductCard } from "@/components/ProductCard";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { MapPin, Phone, Mail } from "lucide-react";
+import { storefrontApiRequest, ShopifyProduct } from "@/lib/shopify";
+import { FEATURED_PRODUCTS, BEST_SELLERS } from "@/data/featured-products";
 
 const GET_PRODUCTS_QUERY = `
-  query GetProducts($first: Int!) {
+  query getProducts($first: Int!) {
     products(first: $first) {
       edges {
         node {
           id
           title
+          description
           handle
           priceRange {
             minVariantPrice {
@@ -56,21 +39,18 @@ const GET_PRODUCTS_QUERY = `
   }
 `;
 
-const Index = () => {
+export default function Index() {
   const navigate = useNavigate();
-  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [allProducts, setAllProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        setLoading(true);
-        const data = await storefrontApiRequest(GET_PRODUCTS_QUERY, { first: 10 });
-        if (data?.data?.products?.edges) {
-          setProducts(data.data.products.edges);
-        }
+        const data = await storefrontApiRequest(GET_PRODUCTS_QUERY, { first: 20 });
+        setAllProducts(data.data.products.edges);
       } catch (error) {
-        console.error("Erro ao buscar produtos:", error);
+        console.error('Error fetching products:', error);
       } finally {
         setLoading(false);
       }
@@ -79,95 +59,164 @@ const Index = () => {
     fetchProducts();
   }, []);
 
+  // Função auxiliar para encontrar produto por handle
+  const findProductByHandle = (handle: string) => {
+    return allProducts.find(p => p.node.handle === handle);
+  };
+
+  // Renderizar produto individual
+  const renderProduct = (productData: typeof FEATURED_PRODUCTS[0], index: number) => {
+    if (loading) {
+      return (
+        <div key={index} className="space-y-3">
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      );
+    }
+
+    const shopifyProduct = findProductByHandle(productData.handle);
+    if (!shopifyProduct) return null;
+
+    return (
+      <div 
+        key={productData.handle}
+        onClick={() => navigate(`/product/${productData.handle}`)}
+        className="cursor-pointer"
+      >
+        <ProductCard
+          product={{
+            id: shopifyProduct.node.id,
+            name: shopifyProduct.node.title,
+            price: parseFloat(shopifyProduct.node.priceRange.minVariantPrice.amount),
+            image: shopifyProduct.node.images.edges[0]?.node.url || "/placeholder.svg",
+            handle: shopifyProduct.node.handle
+          }}
+        />
+      </div>
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col">
       <Header />
 
-      <main className="container mx-auto px-4 py-12">
-        {/* Featured Products Section */}
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-foreground">
-              Produtos em Destaque
-            </h2>
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground">Navegar</span>
-              <Button variant="outline" size="icon">
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-              <Button variant="outline" size="icon">
-                <ChevronRight className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {loading ? (
-              <div className="col-span-full flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : products.length === 0 ? (
-              <div className="col-span-full text-center py-12">
-                <p className="text-muted-foreground">
-                  Nenhum produto encontrado. Crie produtos na sua loja Shopify.
-                </p>
-              </div>
-            ) : (
-              products.map((product) => (
-                <ProductCard
-                  key={product.node.id}
-                  product={{
-                    id: product.node.id,
-                    name: product.node.title,
-                    price: parseFloat(product.node.priceRange.minVariantPrice.amount),
-                    image: product.node.images.edges[0]?.node.url || "/placeholder.svg",
-                    handle: product.node.handle,
-                  }}
-                  onClick={() => navigate(`/product/${product.node.handle}`)}
-                />
-              ))
-            )}
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-br from-primary/10 via-background to-accent/10 py-16 border-b">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+              Componentes para Máquinas Automáticas
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Soluções completas em movimentação linear, perfis estruturais e componentes de precisão
+            </p>
+            <Button size="lg" className="bg-primary hover:bg-primary/90">
+              Ver Catálogo Completo
+            </Button>
           </div>
         </section>
 
-        {/* Info Section */}
-        <section className="mt-16 bg-card p-8 rounded-lg border">
-          <h2 className="text-2xl font-bold text-foreground mb-4">
-            Perfis Estruturais Personalizados
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6 text-muted-foreground">
-            <div>
-              <h3 className="font-semibold text-foreground mb-2">
-                Configuração Sob Medida
-              </h3>
-              <p className="text-sm">
-                Configure seus perfis de alumínio com comprimentos personalizados de 1mm a 3000mm. 
-                Escolha entre diversos serviços de usinagem sem custo adicional.
-              </p>
+        {/* Produtos em Destaque */}
+        <section className="py-12 bg-background">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-8 text-foreground">
+              Produtos em Destaque
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {FEATURED_PRODUCTS.map((product, index) => renderProduct(product, index))}
             </div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-2">
-                Qualidade e Precisão
-              </h3>
-              <p className="text-sm">
-                Perfis em alumínio com acabamento em pintura eletrostática preta. 
-                Tolerância de corte de até ±3mm conforme norma ABNT NBR 8116.
-              </p>
+          </div>
+        </section>
+
+        {/* Mais Vendidos */}
+        <section className="py-12 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-8 text-foreground">
+              Mais Vendidos
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {BEST_SELLERS.map((product, index) => renderProduct(product, index))}
+            </div>
+          </div>
+        </section>
+
+        {/* Seção de Contato */}
+        <section className="py-16 bg-background border-t">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <Card>
+                <CardContent className="p-8">
+                  <h2 className="text-3xl font-bold text-center mb-8 text-foreground">
+                    Dúvidas? Entre em contato conosco
+                  </h2>
+                  
+                  <div className="grid md:grid-cols-2 gap-8">
+                    {/* Informações de Contato */}
+                    <div className="space-y-6">
+                      <div className="flex items-start gap-3">
+                        <MapPin className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+                        <div>
+                          <h3 className="font-semibold mb-1">Endereço</h3>
+                          <p className="text-muted-foreground text-sm">
+                            Av. Imirim, 2850 - Imirim<br />
+                            São Paulo - SP, 02465-600
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Phone className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+                        <div>
+                          <h3 className="font-semibold mb-1">Telefones</h3>
+                          <p className="text-muted-foreground text-sm">
+                            <a href="tel:+551156666461" className="hover:text-primary transition-colors">
+                              (11) 5666-6461
+                            </a>
+                            <br />
+                            <a href="tel:+5511942428989" className="hover:text-primary transition-colors">
+                              (11) 94242-8989
+                            </a>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Mail className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+                        <div>
+                          <h3 className="font-semibold mb-1">Email</h3>
+                          <a
+                            href="mailto:vendas@pradoindustrial.com.br"
+                            className="text-muted-foreground hover:text-primary text-sm transition-colors"
+                          >
+                            vendas@pradoindustrial.com.br
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mapa */}
+                    <div className="rounded-lg overflow-hidden border border-border h-64">
+                      <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3658.3828775628044!2d-46.63841492369895!3d-23.493088778822547!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94cef6a3e3b3b3b3%3A0x3b3b3b3b3b3b3b3b!2sAv.%20Imirim%2C%202850%20-%20Imirim%2C%20S%C3%A3o%20Paulo%20-%20SP%2C%2002465-600!5e0!3m2!1spt-BR!2sbr!4v1234567890123!5m2!1spt-BR!2sbr"
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      ></iframe>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-primary text-primary-foreground mt-16 py-8">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-sm">
-            © 2024 Prado Automação Industrial. Todos os direitos reservados.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
-};
-
-export default Index;
+}
