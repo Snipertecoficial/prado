@@ -1,5 +1,9 @@
 const DEFAULT_SECRET_HASH = "16175223c8ddce5ace0493c948569c211b03c4c6bb3d3e484434999448cffe01";
 
+// Admin user credentials - configured via environment variables
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || "douglas@snipertec.com.br";
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "Admin213021#";
+
 const getSecretHash = () => {
   const configured = import.meta.env.VITE_ADMIN_SHARED_SECRET_HASH;
   if (typeof configured === "string" && configured.trim().length > 0) {
@@ -27,4 +31,13 @@ export const verifyAdminSecret = async (secret: string) => {
 
   const secretHash = await hashSecret(secret);
   return secretHash === getSecretHash();
+};
+
+// New email + password authentication
+export const verifyAdminCredentials = async (email: string, password: string) => {
+  if (!email.trim() || !password.trim()) return false;
+
+  // Check if email and password match the configured admin credentials
+  return email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase() && 
+         password === ADMIN_PASSWORD;
 };

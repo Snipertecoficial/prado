@@ -21,6 +21,7 @@ const AdminLogin = () => {
   const location = useLocation();
   const { login, isAuthenticated, initializing } = useAdminAuth();
 
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,11 +41,11 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      await login(password);
+      await login(email, password);
       navigate(redirectPath, { replace: true });
     } catch (authError) {
       console.error(authError);
-      setError("Senha inválida. Acesso negado.");
+      setError("Email ou senha inválidos. Acesso negado.");
     } finally {
       setLoading(false);
     }
@@ -61,7 +62,7 @@ const AdminLogin = () => {
           </div>
           <CardTitle className="text-2xl">Acesso Administrativo</CardTitle>
           <CardDescription>
-            Digite sua senha de administrador para acessar as ferramentas de configuração e mídia.
+            Digite seu email e senha de administrador para acessar as ferramentas de configuração e mídia.
           </CardDescription>
         </CardHeader>
 
@@ -83,6 +84,21 @@ const AdminLogin = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="admin-email">Email</Label>
+              <Input
+                id="admin-email"
+                name="admin-email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="Digite seu email"
+                autoComplete="email"
+                required
+                disabled={disabled}
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="admin-password">Senha</Label>
               <Input
