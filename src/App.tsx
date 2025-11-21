@@ -8,6 +8,8 @@ import Product from "./pages/Product";
 import Category from "./pages/Category";
 import Configurator from "./pages/Configurator";
 import NotFound from "./pages/NotFound";
+import AdminMedia from "./pages/AdminMedia";
+import AdminProducts from "./pages/AdminProducts";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +25,8 @@ const App = () => (
           <Route path="/categoria/:categorySlug" element={<Category />} />
           <Route path="/categoria/:categorySlug/:subcategorySlug" element={<Category />} />
           <Route path="/admin/configurator" element={<Configurator />} />
+          <Route path="/admin/products" element={<AdminProducts />} />
+          <Route path="/admin/media" element={<AdminMedia />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
