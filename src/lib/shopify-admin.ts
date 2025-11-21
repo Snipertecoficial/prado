@@ -9,7 +9,6 @@ export interface StagedUploadTarget {
   parameters: Array<{ name: string; value: string }>;
 }
 
-async function adminApiRequest<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
   if (!ADMIN_ACCESS_TOKEN) {
     throw new Error("Token de API Admin não configurado. Defina VITE_SHOPIFY_ADMIN_API_TOKEN.");
   }
