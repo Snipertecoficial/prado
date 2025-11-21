@@ -1,6 +1,8 @@
 import { SHOPIFY_API_VERSION, SHOPIFY_STORE_DOMAIN } from "./shopify";
 
 const ADMIN_API_URL = `https://${SHOPIFY_STORE_DOMAIN}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`;
+import { SHOPIFY_API_VERSION, SHOPIFY_DOMAIN } from "./shopify";
+
 const ADMIN_ACCESS_TOKEN = import.meta.env.VITE_SHOPIFY_ADMIN_API_TOKEN || "";
 
 export interface StagedUploadTarget {
@@ -41,6 +43,14 @@ export async function adminApiRequest<T>(query: string, variables: Record<string
   if (!ADMIN_ACCESS_TOKEN) {
     throw new Error("Token de API Admin não configurado. Defina VITE_SHOPIFY_ADMIN_API_TOKEN.");
   }
+
+  if (!SHOPIFY_DOMAIN || !SHOPIFY_API_VERSION) {
+    throw new Error(
+      "Configuração da Shopify ausente. Defina VITE_SHOPIFY_DOMAIN e VITE_SHOPIFY_API_VERSION.",
+    );
+  }
+
+  const ADMIN_API_URL = `https://${SHOPIFY_DOMAIN}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`;
 
   const response = await fetch(ADMIN_API_URL, {
     method: "POST",

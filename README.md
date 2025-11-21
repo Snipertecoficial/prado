@@ -36,6 +36,18 @@ npm i
 npm run dev
 ```
 
+### Environment configuration
+
+Before running the project, copy `.env.example` to `.env` and fill in your Shopify Storefront credentials:
+
+```
+VITE_SHOPIFY_DOMAIN=your-shopify-domain.myshopify.com
+VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your-storefront-access-token
+VITE_SHOPIFY_API_VERSION=2024-07
+```
+
+These variables are required for the storefront API calls and should be provided by your deployment environment.
+
 **Edit a file directly in GitHub**
 
 - Navigate to the desired file(s).
