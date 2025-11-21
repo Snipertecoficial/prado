@@ -9,6 +9,7 @@ import Category from "./pages/Category";
 import Configurator from "./pages/Configurator";
 import NotFound from "./pages/NotFound";
 import AdminMedia from "./pages/AdminMedia";
+
 const queryClient = new QueryClient();
 
 const App = () => (
