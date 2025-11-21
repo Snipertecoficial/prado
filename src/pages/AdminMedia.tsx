@@ -8,6 +8,7 @@ import {
   updateProductMedia,
   type StagedUploadTarget,
 } from "@/lib/shopify-admin";
+import { MAX_FILE_SIZE, ALLOWED_IMAGE_TYPES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -240,18 +241,15 @@ const AdminMedia = () => {
     if (!selectedFiles.length) return;
 
     // Validate file types and sizes
-    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-    const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    
     const invalidFiles = selectedFiles.filter(file => {
-      const isValidType = ALLOWED_TYPES.includes(file.type);
+      const isValidType = ALLOWED_IMAGE_TYPES.includes(file.type);
       const isValidSize = file.size <= MAX_FILE_SIZE;
       return !isValidType || !isValidSize;
     });
 
     if (invalidFiles.length > 0) {
       const messages = invalidFiles.map(file => {
-        if (!ALLOWED_TYPES.includes(file.type)) {
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
           return `${file.name}: tipo de arquivo inválido`;
         }
         if (file.size > MAX_FILE_SIZE) {
