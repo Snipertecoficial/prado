@@ -48,6 +48,27 @@ VITE_SHOPIFY_API_VERSION=2024-07
 
 These variables are required for the storefront API calls and should be provided by your deployment environment.
 
+#### Admin Authentication Setup
+
+The admin area (`/admin/*` routes) is protected by password authentication using SHA-256 hashing. To set up admin access:
+
+1. Generate a SHA-256 hash of your desired password:
+   ```bash
+   echo -n "your_password_here" | sha256sum
+   ```
+
+2. Add the hash to your `.env` file:
+   ```
+   VITE_ADMIN_SHARED_SECRET_HASH=your_generated_hash_here
+   ```
+
+3. When logging in to `/admin/login`, use your actual password (not the hash).
+
+**Security Notes:**
+- Never commit your `.env` file or expose your password
+- The hash in `.env.example` is just an example - always use your own
+- Admin sessions are stored locally and expire after 8 hours
+
 **Edit a file directly in GitHub**
 
 - Navigate to the desired file(s).
