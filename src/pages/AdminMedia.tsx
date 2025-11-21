@@ -239,6 +239,35 @@ const AdminMedia = () => {
     const selectedFiles = files ? Array.from(files) : Array.from(fileInputRef.current?.files || []);
     if (!selectedFiles.length) return;
 
+    // Validate file types and sizes
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    
+    const invalidFiles = selectedFiles.filter(file => {
+      const isValidType = ALLOWED_TYPES.includes(file.type);
+      const isValidSize = file.size <= MAX_FILE_SIZE;
+      return !isValidType || !isValidSize;
+    });
+
+    if (invalidFiles.length > 0) {
+      const messages = invalidFiles.map(file => {
+        if (!ALLOWED_TYPES.includes(file.type)) {
+          return `${file.name}: tipo de arquivo inválido`;
+        }
+        if (file.size > MAX_FILE_SIZE) {
+          return `${file.name}: arquivo muito grande (máximo 10MB)`;
+        }
+        return file.name;
+      });
+      
+      toast({
+        variant: "destructive",
+        title: "Arquivos inválidos",
+        description: messages.join(', '),
+      });
+      return;
+    }
+
     const initialStatuses: UploadStatus[] = selectedFiles.map(file => ({
       fileName: file.name,
       state: "pending",
