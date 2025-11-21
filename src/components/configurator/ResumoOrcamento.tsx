@@ -17,7 +17,7 @@ import {
 
 interface ResumoOrcamentoProps {
   pecas: PecaPerfil2040[];
-  productVariantId: string;
+  productVariantId?: string;
   produtoConfig?: import("@/types/product").ProdutoConfig;
 }
 
@@ -33,6 +33,15 @@ const ResumoOrcamento = ({ pecas, productVariantId, produtoConfig }: ResumoOrcam
 
   const handleAddToCart = async () => {
     try {
+      if (!productVariantId) {
+        toast({
+          title: "Selecione o produto",
+          description: "Crie ou escolha um produto no admin para finalizar a compra.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Validar se todos os campos obrigatórios estão preenchidos
       for (let i = 0; i < pecas.length; i++) {
         const peca = pecas[i];
@@ -200,7 +209,7 @@ const ResumoOrcamento = ({ pecas, productVariantId, produtoConfig }: ResumoOrcam
           size="lg"
           className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
           onClick={handleAddToCart}
-          disabled={isLoading}
+          disabled={isLoading || !productVariantId}
         >
           {isLoading ? (
             <>
