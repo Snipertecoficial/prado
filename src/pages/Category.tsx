@@ -48,11 +48,53 @@ const GET_PRODUCTS_BY_TAG_QUERY = `
   }
 `;
 
+const GET_FALLBACK_PRODUCTS = `
+  query getProducts($first: Int!) {
+    products(first: $first) {
+      edges {
+        node {
+          id
+          title
+          description
+          handle
+          priceRange {
+            minVariantPrice {
+              amount
+              currencyCode
+            }
+          }
+          images(first: 1) {
+            edges {
+              node {
+                url
+                altText
+              }
+            }
+          }
+          variants(first: 1) {
+            edges {
+              node {
+                id
+                title
+                price {
+                  amount
+                  currencyCode
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export default function Category() {
   const { categorySlug, subcategorySlug } = useParams();
   const navigate = useNavigate();
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const category = CATEGORIES.find(c => c.slug === categorySlug);
   const subcategory = category?.subcategories.find(s => s.slug === subcategorySlug);
@@ -61,20 +103,30 @@ export default function Category() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        
+        setError(null);
+
         // Buscar produtos com tag da subcategoria
-        const searchQuery = subcategorySlug 
+        const searchQuery = subcategorySlug
           ? `tag:${subcategorySlug}`
           : `tag:${categorySlug}`;
 
         const data = await storefrontApiRequest(GET_PRODUCTS_BY_TAG_QUERY, {
           query: searchQuery,
-          first: 50
+          first: 50,
         });
+        const taggedProducts = data.data.products.edges as ShopifyProduct[];
 
-        setProducts(data.data.products.edges);
+        if (taggedProducts.length) {
+          setProducts(taggedProducts);
+        } else {
+          const fallback = await storefrontApiRequest(GET_FALLBACK_PRODUCTS, { first: 20 });
+          const fallbackProducts = fallback.data.products.edges as ShopifyProduct[];
+          setProducts(fallbackProducts);
+          setError("Nenhum produto com esta categoria; exibindo catálogo completo.");
+        }
       } catch (error) {
         console.error('Error fetching products:', error);
+        setError("Não foi possível carregar os produtos agora.");
       } finally {
         setLoading(false);
       }
@@ -113,6 +165,12 @@ export default function Category() {
           )}
         </div>
 
+        {error && (
+          <div className="mb-6 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-destructive">
+            {error}
+          </div>
+        )}
+
         {/* Products Grid */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -138,7 +196,7 @@ export default function Category() {
                     name: product.node.title,
                     price: parseFloat(product.node.priceRange.minVariantPrice.amount),
                     image: product.node.images.edges[0]?.node.url || "/placeholder.svg",
-                    handle: product.node.handle
+                    handle: product.node.handle,
                   }}
                 />
               </div>

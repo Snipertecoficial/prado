@@ -102,7 +102,12 @@ export default function Index() {
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               Soluções completas em movimentação linear, perfis estruturais e componentes de precisão
             </p>
-            <Button size="lg" className="bg-primary hover:bg-primary/90">
+            <Button
+              type="button"
+              size="lg"
+              className="bg-primary hover:bg-primary/90"
+              onClick={() => navigate("/categoria/perfil-estrutural")}
+            >
               Ver Catálogo Completo
             </Button>
           </div>
