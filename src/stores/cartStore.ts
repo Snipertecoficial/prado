@@ -9,6 +9,8 @@ interface CartStore {
   
   // Actions
   addItem: (item: CartItem) => void;
+  updateQuantity: (variantId: string, quantity: number) => void;
+  removeItem: (variantId: string) => void;
   clearCart: () => void;
   setCheckoutUrl: (url: string) => void;
   setLoading: (loading: boolean) => void;
@@ -25,6 +27,27 @@ export const useCartStore = create<CartStore>()(
       addItem: (item) => {
         const { items } = get();
         set({ items: [...items, item] });
+      },
+
+      updateQuantity: (variantId, quantity) => {
+        if (quantity <= 0) {
+          get().removeItem(variantId);
+          return;
+        }
+        
+        const { items } = get();
+        set({
+          items: items.map(item =>
+            item.variantId === variantId ? { ...item, quantity } : item
+          )
+        });
+      },
+
+      removeItem: (variantId) => {
+        const { items } = get();
+        set({
+          items: items.filter(item => item.variantId !== variantId)
+        });
       },
 
       clearCart: () => {

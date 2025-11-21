@@ -1,6 +1,9 @@
-import { Search, ShoppingCart, User, MapPin } from "lucide-react";
+import { Search, User, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
+import { CategoryMenu } from "./CategoryMenu";
+import { CartDrawer } from "./CartDrawer";
 
 const Header = () => {
   return (
@@ -32,14 +35,14 @@ const Header = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-8">
             {/* Logo */}
-            <div className="flex-shrink-0">
+            <Link to="/" className="flex-shrink-0">
               <h1 className="text-3xl font-bold text-primary">
                 PRADO
                 <span className="block text-sm font-normal text-muted-foreground">
                   AUTOMAÇÃO INDUSTRIAL
                 </span>
               </h1>
-            </div>
+            </Link>
 
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl relative">
@@ -59,53 +62,25 @@ const Header = () => {
 
             {/* User Actions */}
             <div className="flex items-center gap-4">
-              <div className="text-right">
+              <Link to="/account" className="text-right">
                 <p className="text-sm text-muted-foreground">Olá,</p>
                 <Button variant="link" className="p-0 h-auto text-foreground">
                   Sua conta
                 </Button>
-              </div>
+              </Link>
               <User className="h-6 w-6 text-muted-foreground" />
               
-              <Button variant="ghost" className="relative">
-                <ShoppingCart className="h-6 w-6" />
-                <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  2
-                </span>
-                <span className="ml-2">R$342,00</span>
-              </Button>
+              <CartDrawer />
             </div>
           </div>
         </div>
 
         {/* Navigation Menu */}
-        <nav className="bg-primary text-primary-foreground">
-          <div className="container mx-auto px-4">
-            <ul className="flex items-center justify-center gap-1">
-              {[
-                "Eixos / Pillow",
-                "Guia Linear / Patins",
-                "Fuso de Esferas",
-                "Perfil Estrutural",
-                "Rolamento Linear",
-                "Rolamento Radial",
-                "Mancal",
-              ].map((item) => (
-                <li key={item}>
-                  <Button
-                    variant="ghost"
-                    className="text-primary-foreground hover:bg-primary-foreground/10 rounded-none px-4 py-6"
-                  >
-                    {item}
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </nav>
+        <CategoryMenu />
       </header>
     </>
   );
 };
 
 export default Header;
+export { Header };

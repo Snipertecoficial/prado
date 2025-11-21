@@ -5,9 +5,53 @@ const API_VERSION = '2025-07';
 
 const STOREFRONT_API_URL = `https://${SHOPIFY_DOMAIN}/api/${API_VERSION}/graphql.json`;
 
+export interface ShopifyProduct {
+  node: {
+    id: string;
+    title: string;
+    description: string;
+    handle: string;
+    priceRange: {
+      minVariantPrice: {
+        amount: string;
+        currencyCode: string;
+      };
+    };
+    images: {
+      edges: Array<{
+        node: {
+          url: string;
+          altText: string | null;
+        };
+      }>;
+    };
+    variants: {
+      edges: Array<{
+        node: {
+          id: string;
+          title: string;
+          price: {
+            amount: string;
+            currencyCode: string;
+          };
+        };
+      }>;
+    };
+  };
+}
+
 export interface CartItem {
   variantId: string;
   quantity: number;
+  product: ShopifyProduct;
+  price: {
+    amount: string;
+    currencyCode: string;
+  };
+  selectedOptions: Array<{
+    name: string;
+    value: string;
+  }>;
   attributes?: Array<{
     key: string;
     value: string;

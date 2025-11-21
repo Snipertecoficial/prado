@@ -52,6 +52,8 @@ const ResumoOrcamento = ({ pecas, productVariantId, produtoConfig }: ResumoOrcam
       // Adicionar cada peça como um item do carrinho com custom attributes
       pecas.forEach((peca, index) => {
         const servicoLabel = getServicoLabel(peca.servico);
+        const precoUnitario = (peca.comprimentoMm / 1000) * precoPorMetro;
+        const precoTotal = precoUnitario * peca.quantidade;
         
         const attributes = [
           { key: `Peça #${index + 1} - Comprimento`, value: `${peca.comprimentoMm} mm` },
@@ -78,6 +80,27 @@ const ResumoOrcamento = ({ pecas, productVariantId, produtoConfig }: ResumoOrcam
           variantId: productVariantId,
           quantity: 1,
           attributes,
+          product: {
+            node: {
+              id: productVariantId,
+              title: `Perfil Estrutural - Peça #${index + 1}`,
+              description: '',
+              handle: 'perfil-estrutural',
+              priceRange: {
+                minVariantPrice: {
+                  amount: precoTotal.toString(),
+                  currencyCode: 'BRL'
+                }
+              },
+              images: { edges: [] },
+              variants: { edges: [] }
+            }
+          },
+          price: {
+            amount: precoTotal.toString(),
+            currencyCode: 'BRL'
+          },
+          selectedOptions: []
         });
       });
 
