@@ -1,0 +1,30 @@
+const DEFAULT_SECRET_HASH = "16175223c8ddce5ace0493c948569c211b03c4c6bb3d3e484434999448cffe01";
+
+const getSecretHash = () => {
+  const configured = import.meta.env.VITE_ADMIN_SHARED_SECRET_HASH;
+  if (typeof configured === "string" && configured.trim().length > 0) {
+    return configured.trim().toLowerCase();
+  }
+
+  return DEFAULT_SECRET_HASH;
+};
+
+const toHex = (buffer: ArrayBuffer) =>
+  Array.from(new Uint8Array(buffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+
+export const hashSecret = async (secret: string) => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(secret.trim());
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+
+  return toHex(hashBuffer);
+};
+
+export const verifyAdminSecret = async (secret: string) => {
+  if (!secret.trim()) return false;
+
+  const secretHash = await hashSecret(secret);
+  return secretHash === getSecretHash();
+};
