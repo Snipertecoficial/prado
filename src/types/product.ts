@@ -20,7 +20,7 @@ export interface ServicoConfig {
 export interface DetalhesServico {
   tipoDetalhe?: string;
   textoDetalhes?: string;
-  parametros?: Record<string, any>;
+  parametros?: Record<string, string | number | boolean>;
 }
 
 export interface ProdutoConfig {

@@ -7,7 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { X, AlertCircle, CheckCircle2 } from "lucide-react";
-import { PecaPerfil2040, SERVICOS_OPTIONS, TipoServico, ProdutoConfig } from "@/types/product";
+import {
+  PecaPerfil2040,
+  SERVICOS_OPTIONS,
+  TipoServico,
+  ProdutoConfig,
+  DetalhesServico,
+} from "@/types/product";
 import { calcularPrecoPeca, formatarPreco, validarComprimento, validarQuantidade } from "@/lib/calculations";
 import DetalhesServicoFields from "./DetalhesServicoFields";
 
@@ -72,7 +78,7 @@ const PecaForm = ({ peca, index, onUpdate, onRemove, canRemove, produtoConfig }:
     });
   };
 
-  const handleDetalhesChange = (detalhes: any) => {
+  const handleDetalhesChange = (detalhes: DetalhesServico) => {
     onUpdate({
       ...peca,
       detalhesServico: detalhes,

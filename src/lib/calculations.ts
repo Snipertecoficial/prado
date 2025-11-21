@@ -1,17 +1,17 @@
-import { PecaPerfil2040, ProdutoConfig, getServicoConfig } from "@/types/product";
+import { PecaPerfil2040, ProdutoConfig, TipoServico, getServicoConfig } from "@/types/product";
 
 export function calcularPrecoPeca(
   comprimentoMm: number,
   quantidade: number,
   precoPorMetro: number = 99.0,
-  servicoId?: string
+  servicoId?: TipoServico
 ): number {
   const comprimentoM = comprimentoMm / 1000;
   let precoBase = comprimentoM * precoPorMetro;
   
   // Adicionar custo extra do serviço, se houver
   if (servicoId) {
-    const servicoConfig = getServicoConfig(servicoId as any);
+    const servicoConfig = getServicoConfig(servicoId);
     if (servicoConfig) {
       precoBase += servicoConfig.custoExtra;
     }

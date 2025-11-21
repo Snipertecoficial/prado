@@ -8,7 +8,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, Phone, Mail } from "lucide-react";
 import { storefrontApiRequest, ShopifyProduct } from "@/lib/shopify";
-import { FEATURED_PRODUCTS, BEST_SELLERS } from "@/data/featured-products";
 
 const GET_PRODUCTS_QUERY = `
   query getProducts($first: Int!) {
@@ -41,16 +40,26 @@ const GET_PRODUCTS_QUERY = `
 
 export default function Index() {
   const navigate = useNavigate();
-  const [allProducts, setAllProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [featuredProducts, setFeaturedProducts] = useState<ShopifyProduct[]>([]);
+  const [bestSellers, setBestSellers] = useState<ShopifyProduct[]>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const data = await storefrontApiRequest(GET_PRODUCTS_QUERY, { first: 20 });
-        setAllProducts(data.data.products.edges);
+        const edges: ShopifyProduct[] = data.data.products.edges || [];
+        const uniqueByHandle = Array.from(
+          new Map(edges.map(edge => [edge.node.handle, edge])).values(),
+        );
+
+        setFeaturedProducts(uniqueByHandle.slice(0, 3));
+        setBestSellers(uniqueByHandle.slice(3, 7).length ? uniqueByHandle.slice(3, 7) : uniqueByHandle.slice(0, 4));
       } catch (error) {
         console.error('Error fetching products:', error);
+        setError("Não foi possível carregar os produtos no momento.");
       } finally {
         setLoading(false);
       }
@@ -60,43 +69,24 @@ export default function Index() {
   }, []);
 
   // Função auxiliar para encontrar produto por handle
-  const findProductByHandle = (handle: string) => {
-    return allProducts.find(p => p.node.handle === handle);
-  };
-
   // Renderizar produto individual
-  const renderProduct = (productData: typeof FEATURED_PRODUCTS[0], index: number) => {
-    if (loading) {
-      return (
-        <div key={index} className="space-y-3">
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-        </div>
-      );
-    }
-
-    const shopifyProduct = findProductByHandle(productData.handle);
-    if (!shopifyProduct) return null;
-
-    return (
-      <div 
-        key={productData.handle}
-        onClick={() => navigate(`/product/${productData.handle}`)}
-        className="cursor-pointer"
-      >
-        <ProductCard
-          product={{
-            id: shopifyProduct.node.id,
-            name: shopifyProduct.node.title,
-            price: parseFloat(shopifyProduct.node.priceRange.minVariantPrice.amount),
-            image: shopifyProduct.node.images.edges[0]?.node.url || "/placeholder.svg",
-            handle: shopifyProduct.node.handle
-          }}
-        />
-      </div>
-    );
-  };
+  const renderProduct = (product: ShopifyProduct, index: number) => (
+    <div
+      key={product.node.handle}
+      onClick={() => navigate(`/product/${product.node.handle}`)}
+      className="cursor-pointer"
+    >
+      <ProductCard
+        product={{
+          id: product.node.id,
+          name: product.node.title,
+          price: parseFloat(product.node.priceRange.minVariantPrice.amount),
+          image: product.node.images.edges[0]?.node.url || "/placeholder.svg",
+          handle: product.node.handle,
+        }}
+      />
+    </div>
+  );
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -124,9 +114,23 @@ export default function Index() {
             <h2 className="text-3xl font-bold text-center mb-8 text-foreground">
               Produtos em Destaque
             </h2>
+            {error && (
+              <div className="text-center text-destructive mb-6">{error}</div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              {FEATURED_PRODUCTS.map((product, index) => renderProduct(product, index))}
+              {loading
+                ? Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="space-y-3">
+                      <Skeleton className="h-48 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </div>
+                  ))
+                : featuredProducts.map(renderProduct)}
             </div>
+            {!loading && !featuredProducts.length && !error && (
+              <p className="text-center text-muted-foreground mt-4">Nenhum produto disponível.</p>
+            )}
           </div>
         </section>
 
@@ -137,8 +141,19 @@ export default function Index() {
               Mais Vendidos
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              {BEST_SELLERS.map((product, index) => renderProduct(product, index))}
+              {loading
+                ? Array.from({ length: 4 }).map((_, index) => (
+                    <div key={index} className="space-y-3">
+                      <Skeleton className="h-48 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </div>
+                  ))
+                : bestSellers.map(renderProduct)}
             </div>
+            {!loading && !bestSellers.length && !error && (
+              <p className="text-center text-muted-foreground mt-4">Nenhum produto encontrado.</p>
+            )}
           </div>
         </section>
 

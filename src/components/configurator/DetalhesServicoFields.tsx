@@ -10,7 +10,10 @@ interface DetalhesServicoFieldsProps {
 }
 
 const DetalhesServicoFields = ({ servico, detalhes = {}, onChange }: DetalhesServicoFieldsProps) => {
-  const updateField = (field: keyof DetalhesServico, value: any) => {
+  const updateField = (
+    field: keyof DetalhesServico,
+    value: DetalhesServico[keyof DetalhesServico],
+  ) => {
     onChange({ ...detalhes, [field]: value });
   };
 
