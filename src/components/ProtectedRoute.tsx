@@ -10,7 +10,7 @@ const ProtectedRoute = () => {
     return (
       <div className="flex min-h-[40vh] items-center justify-center gap-2 text-muted-foreground">
         <Loader2 className="h-5 w-5 animate-spin" />
-        <span>Checking access…</span>
+        <span>Verificando acesso...</span>
       </div>
     );
   }
@@ -20,7 +20,7 @@ const ProtectedRoute = () => {
       <Navigate
         to="/admin/login"
         replace
-        state={{ from: location.pathname, message: "You need admin access to continue." }}
+        state={{ from: location.pathname, message: "Você precisa de acesso administrativo para continuar." }}
       />
     );
   }

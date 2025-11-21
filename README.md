@@ -62,14 +62,13 @@ The admin area (`/admin/*` routes) is protected by password authentication using
    VITE_ADMIN_SHARED_SECRET_HASH=your_generated_hash_here
    ```
 
-3. When logging in to `/admin/login`, use your actual password (not the hash).
+3. When logging in to `/admin/login`, enter your password (the interface is in Portuguese).
 
 **⚠️ Security Notes:**
-- **CRITICAL:** Never use the example password/hash from `.env.example` in production!
-- Never commit your `.env` file or expose your password
-- Always generate your own unique, strong password and its hash
+- The password is hashed client-side using SHA-256 before comparison
+- Never commit your `.env` file or expose your password hash
 - Admin sessions are stored locally and expire after 8 hours
-- The default hash in the code is intentionally not documented - you MUST set your own via environment variable
+- Change the default password in production for security
 
 **Edit a file directly in GitHub**
 

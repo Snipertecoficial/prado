@@ -20,7 +20,7 @@ const AdminLogin = () => {
   const location = useLocation();
   const { login, isAuthenticated, initializing } = useAdminAuth();
 
-  const [secret, setSecret] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -39,11 +39,11 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      await login(secret);
+      await login(password);
       navigate(redirectPath, { replace: true });
     } catch (authError) {
       console.error(authError);
-      setError("Invalid admin secret. Access denied.");
+      setError("Senha inválida. Acesso negado.");
     } finally {
       setLoading(false);
     }
@@ -58,9 +58,9 @@ const AdminLogin = () => {
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
             <Shield className="h-6 w-6" />
           </div>
-          <CardTitle className="text-2xl">Admin Access</CardTitle>
+          <CardTitle className="text-2xl">Acesso Administrativo</CardTitle>
           <CardDescription>
-            Enter the shared admin secret to unlock configurator and media tools.
+            Digite sua senha de administrador para acessar as ferramentas de configuração e mídia.
           </CardDescription>
         </CardHeader>
 
@@ -68,7 +68,7 @@ const AdminLogin = () => {
           {state.message && (
             <Alert variant="warning" className="mb-4">
               <ShieldAlert className="h-4 w-4" />
-              <AlertTitle>Authorization required</AlertTitle>
+              <AlertTitle>Autorização necessária</AlertTitle>
               <AlertDescription>{state.message}</AlertDescription>
             </Alert>
           )}
@@ -76,21 +76,21 @@ const AdminLogin = () => {
           {error && (
             <Alert variant="destructive" className="mb-4">
               <ShieldAlert className="h-4 w-4" />
-              <AlertTitle>Access denied</AlertTitle>
+              <AlertTitle>Acesso negado</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="admin-secret">Shared secret</Label>
+              <Label htmlFor="admin-password">Senha</Label>
               <Input
-                id="admin-secret"
-                name="admin-secret"
+                id="admin-password"
+                name="admin-password"
                 type="password"
-                value={secret}
-                onChange={(event) => setSecret(event.target.value)}
-                placeholder="Enter admin secret"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Digite sua senha"
                 autoComplete="current-password"
                 required
                 disabled={disabled}
@@ -98,14 +98,14 @@ const AdminLogin = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={disabled}>
-              {loading ? "Verifying…" : "Unlock admin"}
+              {loading ? "Verificando..." : "Acessar"}
             </Button>
           </form>
         </CardContent>
 
         <CardFooter className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <ShieldCheck className="h-4 w-4" />
-          Sessions are secured locally for a limited time.
+          Sessões são protegidas localmente por tempo limitado.
         </CardFooter>
       </Card>
     </div>
