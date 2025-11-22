@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Shield, ShieldAlert, ShieldCheck } from "lucide-react";
+import "@/utils/hash-generator";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,8 @@ const AdminLogin = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showHashHelper, setShowHashHelper] = useState(false);
+  const [generatedHash, setGeneratedHash] = useState("");
 
   const state = (location.state as { from?: string; message?: string } | null) || {};
   const redirectPath = state.from || "/admin/dashboard";
@@ -48,6 +51,23 @@ const AdminLogin = () => {
       setError("Email ou senha inválidos. Acesso negado.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateHash = async () => {
+    if (!password) {
+      setError("Digite uma senha para gerar o hash");
+      return;
+    }
+    
+    try {
+      const { hashSecret } = await import("@/lib/auth");
+      const hash = await hashSecret(password);
+      setGeneratedHash(hash);
+      setShowHashHelper(true);
+    } catch (error) {
+      console.error("Erro ao gerar hash:", error);
+      setError("Erro ao gerar hash");
     }
   };
 
@@ -117,7 +137,27 @@ const AdminLogin = () => {
             <Button type="submit" className="w-full" disabled={disabled}>
               {loading ? "Verificando..." : "Acessar"}
             </Button>
+
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full mt-2" 
+              onClick={handleGenerateHash}
+              disabled={disabled}
+            >
+              Gerar Hash SHA-256 (Debug)
+            </Button>
           </form>
+
+          {showHashHelper && generatedHash && (
+            <Alert className="mt-4">
+              <ShieldCheck className="h-4 w-4" />
+              <AlertTitle>Hash SHA-256 Gerado</AlertTitle>
+              <AlertDescription className="break-all font-mono text-xs mt-2">
+                {generatedHash}
+              </AlertDescription>
+            </Alert>
+          )}
         </CardContent>
 
         <CardFooter className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
