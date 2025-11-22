@@ -10,6 +10,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminMedia from "./pages/AdminMedia";
 import AdminProducts from "./pages/AdminProducts";
 import AdminSettings from "./pages/AdminSettings";
+import AdminImport from "./pages/AdminImport";
 import Category from "./pages/Category";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/configurator" element={<Configurator />} />
               <Route path="/admin/products" element={<AdminProducts />} />
+              <Route path="/admin/import" element={<AdminImport />} />
               <Route path="/admin/media" element={<AdminMedia />} />
               <Route path="/admin/settings" element={<AdminSettings />} />
             </Route>

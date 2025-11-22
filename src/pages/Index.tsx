@@ -8,61 +8,26 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, Phone, Mail } from "lucide-react";
 import { storefrontApiRequest, ShopifyProduct } from "@/lib/shopify";
-import {
-  BEST_SELLERS_COLLECTION_HANDLE,
-  FEATURED_COLLECTION_HANDLE,
-} from "@/data/featured-products";
-
-const GET_CURATED_PRODUCTS_QUERY = `
-  query getCuratedProducts($featuredHandle: String!, $bestSellersHandle: String!, $first: Int!) {
-    featured: collectionByHandle(handle: $featuredHandle) {
-      title
-      products(first: $first) {
-        edges {
-          node {
-            id
-            title
-            description
-            handle
-            priceRange {
-              minVariantPrice {
-                amount
-                currencyCode
-              }
-            }
-            images(first: 1) {
-              edges {
-                node {
-                  url
-                  altText
-                }
-              }
+const GET_ALL_PRODUCTS_QUERY = `
+  query getAllProducts($first: Int!) {
+    products(first: $first) {
+      edges {
+        node {
+          id
+          title
+          description
+          handle
+          priceRange {
+            minVariantPrice {
+              amount
+              currencyCode
             }
           }
-        }
-      }
-    }
-    bestSellers: collectionByHandle(handle: $bestSellersHandle) {
-      title
-      products(first: $first) {
-        edges {
-          node {
-            id
-            title
-            description
-            handle
-            priceRange {
-              minVariantPrice {
-                amount
-                currencyCode
-              }
-            }
-            images(first: 1) {
-              edges {
-                node {
-                  url
-                  altText
-                }
+          images(first: 1) {
+            edges {
+              node {
+                url
+                altText
               }
             }
           }
@@ -74,35 +39,18 @@ const GET_CURATED_PRODUCTS_QUERY = `
 
 export default function Index() {
   const navigate = useNavigate();
-  const [featuredProducts, setFeaturedProducts] = useState<ShopifyProduct[]>([]);
-  const [bestSellerProducts, setBestSellerProducts] = useState<ShopifyProduct[]>([]);
+  const [allProducts, setAllProducts] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const data = await storefrontApiRequest(GET_CURATED_PRODUCTS_QUERY, {
-          featuredHandle: FEATURED_COLLECTION_HANDLE,
-          bestSellersHandle: BEST_SELLERS_COLLECTION_HANDLE,
-          first: 8,
+        const data = await storefrontApiRequest(GET_ALL_PRODUCTS_QUERY, {
+          first: 12,
         });
 
-        const uniqueByHandle = (products: ShopifyProduct[]) => {
-          const seen = new Set<string>();
-          return products.filter((product) => {
-            const handle = product.node.handle;
-            if (seen.has(handle)) return false;
-            seen.add(handle);
-            return true;
-          });
-        };
-
-        setFeaturedProducts(
-          uniqueByHandle(data.data.featured?.products.edges || []),
-        );
-        setBestSellerProducts(
-          uniqueByHandle(data.data.bestSellers?.products.edges || []),
-        );
+        const products = data.data.products?.edges || [];
+        setAllProducts(products);
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
@@ -112,6 +60,9 @@ export default function Index() {
 
     fetchProducts();
   }, []);
+
+  const featuredProducts = allProducts.slice(0, 3);
+  const bestSellerProducts = allProducts.slice(0, 8);
 
   // Renderizar produto individual
   const renderProduct = (product: ShopifyProduct) => (

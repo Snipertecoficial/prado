@@ -68,7 +68,7 @@ const AdminLogin = () => {
 
         <CardContent>
           {state.message && (
-            <Alert variant="warning" className="mb-4">
+            <Alert variant="destructive" className="mb-4">
               <ShieldAlert className="h-4 w-4" />
               <AlertTitle>Autorização necessária</AlertTitle>
               <AlertDescription>{state.message}</AlertDescription>
