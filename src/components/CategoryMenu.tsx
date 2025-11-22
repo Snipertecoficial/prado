@@ -8,9 +8,9 @@ export const CategoryMenu = () => {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
   return (
-    <nav className="bg-primary text-primary-foreground">
+    <nav className="bg-primary text-primary-foreground shadow-[0_6px_18px_rgba(0,0,0,0.08)]">
       <div className="container mx-auto px-4">
-        <ul className="flex items-center justify-center gap-1">
+        <ul className="flex flex-wrap items-center justify-center gap-1 text-xs sm:text-sm font-semibold uppercase tracking-wide">
           {CATEGORIES.map((category) => (
             <li
               key={category.slug}
@@ -20,8 +20,8 @@ export const CategoryMenu = () => {
             >
               <button
                 className={cn(
-                  "flex items-center gap-1 px-4 py-3 text-sm font-medium transition-colors hover:bg-primary-foreground/10",
-                  openMenu === category.slug && "bg-primary-foreground/10"
+                  "flex items-center gap-1 px-3 sm:px-4 py-3 transition-colors hover:bg-primary/80",
+                  openMenu === category.slug && "bg-primary/80"
                 )}
               >
                 {category.name}
