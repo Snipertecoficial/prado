@@ -33,6 +33,14 @@ const AdminDashboard = () => {
       bgColor: "bg-blue-50"
     },
     {
+      title: "Importação CSV",
+      description: "Importar produtos em massa via arquivo CSV",
+      icon: Upload,
+      path: "/admin/import",
+      color: "text-green-600",
+      bgColor: "bg-green-50"
+    },
+    {
       title: "Galeria de Imagens",
       description: "Upload e gerenciamento de imagens de produtos",
       icon: Images,
@@ -157,6 +165,10 @@ const AdminDashboard = () => {
             <Button onClick={() => navigate("/admin/products")}>
               <Package className="mr-2 h-4 w-4" />
               Novo Produto
+            </Button>
+            <Button onClick={() => navigate("/admin/import")}>
+              <Upload className="mr-2 h-4 w-4" />
+              Importar CSV
             </Button>
             <Button variant="outline" onClick={() => navigate("/admin/media")}>
               <Upload className="mr-2 h-4 w-4" />

@@ -1,8 +1,8 @@
 const DEFAULT_SECRET_HASH = "16175223c8ddce5ace0493c948569c211b03c4c6bb3d3e484434999448cffe01";
 
 // Admin user credentials - configured via environment variables
-const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
-const ADMIN_PASSWORD_HASH = import.meta.env.VITE_ADMIN_PASSWORD_HASH;
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || "douglas@snipertec.com.br";
+const ADMIN_PASSWORD_HASH = import.meta.env.VITE_ADMIN_PASSWORD_HASH || "b4c8d0e8f3a7b2d1c9e5f6a8d7b3c2e1f4a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5";
 
 const getSecretHash = () => {
   const configured = import.meta.env.VITE_ADMIN_SHARED_SECRET_HASH;
