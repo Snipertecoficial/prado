@@ -1,11 +1,21 @@
+import { useState, FormEvent } from "react";
 import { Search, User, Phone, Clock3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CategoryMenu } from "./CategoryMenu";
 import { CartDrawer } from "./CartDrawer";
 
 const Header = () => {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
   return (
     <>
       {/* Top Bar */}
@@ -50,20 +60,23 @@ const Header = () => {
               </Link>
 
               {/* Search Bar */}
-              <div className="flex-1 w-full relative">
+              <form onSubmit={handleSearch} className="flex-1 w-full relative">
                 <Input
                   type="text"
                   placeholder="Buscar produtos e categorias"
                   className="w-full pr-12 h-12 rounded-lg border-border/80"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <Button
+                  type="submit"
                   size="icon"
                   variant="ghost"
                   className="absolute right-1 top-1 h-10 w-10 rounded-md text-primary"
                 >
                   <Search className="h-5 w-5" />
                 </Button>
-              </div>
+              </form>
 
               {/* User Actions */}
               <div className="flex items-center gap-5 w-full lg:w-auto justify-between lg:justify-end">
