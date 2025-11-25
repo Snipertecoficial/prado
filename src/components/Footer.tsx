@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Instagram, Facebook, Linkedin } from "lucide-react";
-
 export const Footer = () => {
-  return (
-    <footer className="bg-gradient-to-br from-primary via-primary/95 to-primary/90 text-primary-foreground mt-16 relative overflow-hidden">
+  return <footer className="bg-gradient-to-br from-primary via-primary/95 to-primary/90 text-primary-foreground mt-16 relative overflow-hidden">
       {/* Decorative pattern overlay */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItaDJ2LTJoLTJ6bTAgNHYyaDJ2LTJoLTJ6bS0yIDJ2Mmgydi0yaC0yem0wLTR2Mmgydi0yaC0yem0yLTJ2LTJoLTJ2Mmgyem0tMiAwdi0yaC0ydjJoMnptLTItMnYtMmgtMnYyaDJ6bTQgMHYtMmgtMnYyaDJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-100"></div>
       
@@ -13,9 +11,7 @@ export const Footer = () => {
           <div className="lg:col-span-1">
             <Link to="/" className="inline-block mb-4 group">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <span className="text-accent-foreground font-bold text-xl">P</span>
-                </div>
+                
                 <div>
                   <p className="text-2xl leading-none font-bold text-primary-foreground">PRADO</p>
                   <span className="block text-[10px] font-semibold tracking-[0.12em] text-primary-foreground/80 uppercase">
@@ -28,25 +24,13 @@ export const Footer = () => {
               Componentes para máquinas automáticas e estruturas modulares de alta qualidade.
             </p>
             <div className="flex gap-3">
-              <a 
-                href="#" 
-                className="w-9 h-9 bg-primary-foreground/10 hover:bg-accent rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                aria-label="Instagram"
-              >
+              <a href="#" className="w-9 h-9 bg-primary-foreground/10 hover:bg-accent rounded-lg flex items-center justify-center transition-all hover:scale-110" aria-label="Instagram">
                 <Instagram className="h-4 w-4" />
               </a>
-              <a 
-                href="#" 
-                className="w-9 h-9 bg-primary-foreground/10 hover:bg-accent rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                aria-label="Facebook"
-              >
+              <a href="#" className="w-9 h-9 bg-primary-foreground/10 hover:bg-accent rounded-lg flex items-center justify-center transition-all hover:scale-110" aria-label="Facebook">
                 <Facebook className="h-4 w-4" />
               </a>
-              <a 
-                href="#" 
-                className="w-9 h-9 bg-primary-foreground/10 hover:bg-accent rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                aria-label="LinkedIn"
-              >
+              <a href="#" className="w-9 h-9 bg-primary-foreground/10 hover:bg-accent rounded-lg flex items-center justify-center transition-all hover:scale-110" aria-label="LinkedIn">
                 <Linkedin className="h-4 w-4" />
               </a>
             </div>
@@ -147,10 +131,7 @@ export const Footer = () => {
                 <div className="w-8 h-8 bg-accent/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-accent transition-colors">
                   <Mail className="h-4 w-4 text-accent group-hover:text-accent-foreground transition-colors" />
                 </div>
-                <a
-                  href="mailto:vendas@pradoindustrial.com.br"
-                  className="text-primary-foreground/90 hover:text-accent text-sm transition-colors"
-                >
+                <a href="mailto:vendas@pradoindustrial.com.br" className="text-primary-foreground/90 hover:text-accent text-sm transition-colors">
                   vendas@pradoindustrial.com.br
                 </a>
               </li>
@@ -175,6 +156,5 @@ export const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
