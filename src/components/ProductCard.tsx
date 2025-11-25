@@ -1,27 +1,36 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types/product";
 import { formatarPreco } from "@/lib/calculations";
+import { Star } from "lucide-react";
 
 interface ProductCardProps {
   product: Product & { handle?: string };
   onClick?: () => void;
+  featured?: boolean;
 }
 
-const ProductCard = ({ product, onClick }: ProductCardProps) => {
+const ProductCard = ({ product, onClick, featured = false }: ProductCardProps) => {
   return (
     <Card
-      className="hover:shadow-md transition-shadow cursor-pointer border-border/80 h-full"
+      className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-border/80 h-full hover:-translate-y-1 relative overflow-hidden"
       onClick={onClick}
     >
+      {featured && (
+        <Badge className="absolute top-3 right-3 z-10 bg-accent text-accent-foreground">
+          <Star className="h-3 w-3 mr-1 fill-current" />
+          Destaque
+        </Badge>
+      )}
       <CardContent className="p-4 space-y-3 h-full flex flex-col">
-        <div className="aspect-square relative bg-[#f1f4fb] rounded-lg overflow-hidden flex items-center justify-center">
+        <div className="aspect-square relative bg-muted/50 rounded-lg overflow-hidden flex items-center justify-center group-hover:bg-muted/70 transition-colors">
           <img
             src={product.image}
             alt={product.name}
-            className="object-contain w-full h-full p-6"
+            className="object-contain w-full h-full p-6 group-hover:scale-105 transition-transform duration-300"
           />
         </div>
-        <h3 className="font-semibold text-sm text-center text-[#1f2a44] leading-snug min-h-[44px]">
+        <h3 className="font-semibold text-sm text-center text-foreground leading-snug min-h-[44px] group-hover:text-primary transition-colors">
           {product.name}
         </h3>
         <div className="text-center mt-auto">

@@ -53,8 +53,9 @@ export const Footer = () => {
               <li className="flex items-start gap-2">
                 <MapPin className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <span className="text-muted-foreground text-sm">
-                  Av. Imirim, 2850 - Imirim<br />
-                  São Paulo - SP, 02465-600
+                  Rua Antônio Le Voci, 151<br />
+                  Terceira Divisão de Interlagos<br />
+                  São Paulo - SP, 04809-220
                 </span>
               </li>
               <li className="flex items-center gap-2">

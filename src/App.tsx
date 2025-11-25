@@ -15,6 +15,8 @@ import Category from "./pages/Category";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Product from "./pages/Product";
+import Catalog from "./pages/Catalog";
+import Search from "./pages/Search";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -30,6 +32,8 @@ const App = () => (
             {/* Public routes */}
             <Route path="/" element={<Index />} />
             <Route path="/product/:handle" element={<Product />} />
+            <Route path="/catalog" element={<Catalog />} />
+            <Route path="/search" element={<Search />} />
             <Route path="/categoria/:categorySlug" element={<Category />} />
             <Route path="/categoria/:categorySlug/:subcategorySlug" element={<Category />} />
             
