@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { storefrontApiRequest, ShopifyProduct } from "@/lib/shopify";
 
 const GET_ALL_PRODUCTS_QUERY = `
@@ -71,17 +71,21 @@ export default function Index() {
     fetchProducts();
   }, []);
 
-  // Filter products by tags
+  // Use all products for both sections if no tags exist, otherwise filter by tags
   const featuredProducts = allProducts.filter(p => p.node.tags?.includes('featured'));
   const bestSellerProducts = allProducts.filter(p => p.node.tags?.includes('best-seller'));
   
+  // If no tagged products, show all products in both sections
+  const displayFeatured = featuredProducts.length > 0 ? featuredProducts : allProducts;
+  const displayBestSellers = bestSellerProducts.length > 0 ? bestSellerProducts : allProducts;
+  
   // Products to display (4 at a time)
-  const visibleFeatured = featuredProducts.slice(featuredIndex, featuredIndex + 4);
-  const visibleBestSellers = bestSellerProducts.slice(bestSellerIndex, bestSellerIndex + 4);
+  const visibleFeatured = displayFeatured.slice(featuredIndex, featuredIndex + 4);
+  const visibleBestSellers = displayBestSellers.slice(bestSellerIndex, bestSellerIndex + 4);
 
   // Navigation handlers
   const nextFeatured = () => {
-    if (featuredIndex + 4 < featuredProducts.length) {
+    if (featuredIndex + 4 < displayFeatured.length) {
       setFeaturedIndex(featuredIndex + 4);
     }
   };
@@ -91,7 +95,7 @@ export default function Index() {
     }
   };
   const nextBestSeller = () => {
-    if (bestSellerIndex + 4 < bestSellerProducts.length) {
+    if (bestSellerIndex + 4 < displayBestSellers.length) {
       setBestSellerIndex(bestSellerIndex + 4);
     }
   };
@@ -214,7 +218,7 @@ export default function Index() {
               onPrev={prevFeatured}
               onNext={nextFeatured}
               canPrev={featuredIndex > 0}
-              canNext={featuredIndex + 4 < featuredProducts.length}
+              canNext={featuredIndex + 4 < displayFeatured.length}
             />
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -224,7 +228,7 @@ export default function Index() {
                   <ProductCard key={product.node.id} product={product} />
                 ))
               }
-              {!loading && featuredProducts.length === 0 && (
+              {!loading && displayFeatured.length === 0 && (
                 <div className="col-span-full text-center text-muted-foreground py-12">
                   Nenhum produto em destaque disponível no momento.
                 </div>
@@ -241,7 +245,7 @@ export default function Index() {
               onPrev={prevBestSeller}
               onNext={nextBestSeller}
               canPrev={bestSellerIndex > 0}
-              canNext={bestSellerIndex + 4 < bestSellerProducts.length}
+              canNext={bestSellerIndex + 4 < displayBestSellers.length}
             />
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -251,7 +255,7 @@ export default function Index() {
                   <ProductCard key={product.node.id} product={product} />
                 ))
               }
-              {!loading && bestSellerProducts.length === 0 && (
+              {!loading && displayBestSellers.length === 0 && (
                 <div className="col-span-full text-center text-muted-foreground py-12">
                   Ainda não há produtos mais vendidos disponíveis.
                 </div>
@@ -267,80 +271,6 @@ export default function Index() {
               >
                 Ver Todos os Produtos
               </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Seção de Contato */}
-        <section id="contact" className="py-16 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <Card className="border-2 border-border">
-                <CardContent className="p-8">
-                  <h2 className="text-3xl font-bold text-center mb-2 text-primary">
-                    Dúvidas? Entre em contato conosco
-                  </h2>
-                  <p className="text-center text-muted-foreground mb-8">
-                    Nossa equipe está pronta para atender você
-                  </p>
-                  
-                  <div className="grid md:grid-cols-2 gap-8">
-                    {/* Contact Info */}
-                    <div className="space-y-6">
-                      <div className="flex items-start gap-3">
-                        <MapPin className="h-6 w-6 text-accent flex-shrink-0 mt-1" />
-                        <div>
-                          <h3 className="font-semibold mb-1 text-foreground">Endereço</h3>
-                          <p className="text-muted-foreground text-sm">
-                            Rua Antônio Le Voci, 151<br />
-                            Terceira Divisão de Interlagos<br />
-                            São Paulo - SP, 04809-220
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <Phone className="h-6 w-6 text-accent flex-shrink-0 mt-1" />
-                        <div>
-                          <h3 className="font-semibold mb-1 text-foreground">Telefones</h3>
-                          <p className="text-muted-foreground text-sm">
-                            <a href="tel:+551156666461" className="hover:text-primary transition-colors">
-                              (11) 5666-6461
-                            </a>
-                            <br />
-                            <a href="tel:+5511942428989" className="hover:text-primary transition-colors">
-                              (11) 94242-8989
-                            </a>
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <Mail className="h-6 w-6 text-accent flex-shrink-0 mt-1" />
-                        <div>
-                          <h3 className="font-semibold mb-1 text-foreground">Email</h3>
-                          <a href="mailto:vendas@pradoindustrial.com.br" className="text-muted-foreground hover:text-primary text-sm transition-colors">
-                            vendas@pradoindustrial.com.br
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Map */}
-                    <div className="rounded-lg overflow-hidden border border-border h-64">
-                      <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3655.5934886!2d-46.6987!3d-23.6826!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce4f8b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sRua%20Ant%C3%B4nio%20Le%20Voci%2C%20151%20-%20Cidade%20Dutra%2C%20S%C3%A3o%20Paulo%20-%20SP%2C%2004809-220!5e0!3m2!1spt-BR!2sbr!4v1234567890123!5m2!1spt-BR!2sbr" 
-                        width="100%" 
-                        height="100%" 
-                        style={{ border: 0 }} 
-                        allowFullScreen 
-                        loading="lazy" 
-                        referrerPolicy="no-referrer-when-downgrade"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </section>
