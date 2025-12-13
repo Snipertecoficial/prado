@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { CategoryMenu } from "./CategoryMenu";
 import { CartDrawer } from "./CartDrawer";
 import { INSTITUTIONAL_LINKS } from "@/data/categories";
+import logo from "@/assets/logo.jpg";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -73,16 +74,12 @@ const Header = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-3 flex-shrink-0">
-              <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
-                <span className="text-accent-foreground font-bold text-xl">P</span>
-              </div>
-              <div>
-                <p className="text-2xl leading-none font-bold text-primary">PRADO</p>
-                <span className="block text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
-                  Automação Industrial
-                </span>
-              </div>
+            <Link to="/" className="flex-shrink-0">
+              <img 
+                src={logo} 
+                alt="Prado Automação Industrial" 
+                className="h-12 object-contain"
+              />
             </Link>
 
             {/* Search Bar */}
