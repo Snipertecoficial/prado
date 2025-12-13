@@ -108,8 +108,10 @@ export default function Category() {
           <h1 className="text-3xl font-bold mb-2">
             {subcategory?.name || category?.name}
           </h1>
-          {category?.description && (
-            <p className="text-muted-foreground">{category.description}</p>
+          {subcategory && (
+            <p className="text-muted-foreground">
+              Produtos da categoria {category?.name} - {subcategory.name}
+            </p>
           )}
         </div>
 
