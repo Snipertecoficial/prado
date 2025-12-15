@@ -1,17 +1,63 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useProductSync } from "@/hooks/useProductSync";
-import { ArrowLeft, Filter } from "lucide-react";
+import { storefrontApiRequest, ShopifyProduct } from "@/lib/shopify";
+import { ArrowLeft } from "lucide-react";
+
+const GET_ALL_PRODUCTS_QUERY = `
+  query getAllProducts($first: Int!) {
+    products(first: $first) {
+      edges {
+        node {
+          id
+          title
+          description
+          handle
+          priceRange {
+            minVariantPrice {
+              amount
+              currencyCode
+            }
+          }
+          images(first: 1) {
+            edges {
+              node {
+                url
+                altText
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 export default function Catalog() {
   const navigate = useNavigate();
-  const { products, loading } = useProductSync(60000);
+  const [products, setProducts] = useState<ShopifyProduct[]>([]);
+  const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(20);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await storefrontApiRequest(GET_ALL_PRODUCTS_QUERY, {
+          first: 100
+        });
+        setProducts(data?.data?.products?.edges || []);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const visibleProducts = products.slice(0, visibleCount);
   const hasMore = visibleCount < products.length;
