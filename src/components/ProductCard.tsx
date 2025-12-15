@@ -1,11 +1,18 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Product } from "@/types/product";
 import { formatarPreco } from "@/lib/calculations";
 import { Star } from "lucide-react";
 
 interface ProductCardProps {
-  product: Product & { handle?: string };
+  product: {
+    id?: string;
+    name: string;
+    price: number;
+    image: string;
+    installments?: number;
+    installmentPrice?: number;
+    handle?: string;
+  };
   onClick?: () => void;
   featured?: boolean;
 }

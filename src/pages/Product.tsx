@@ -1,14 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Plus, Loader2 } from "lucide-react";
-import { PecaPerfil2040, PRODUTO_DEFAULT_CONFIG } from "@/types/product";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
-import PecaForm from "@/components/configurator/PecaForm";
-import ResumoOrcamento from "@/components/configurator/ResumoOrcamento";
-import { storefrontApiRequest } from "@/lib/shopify";
+import { Footer } from "@/components/Footer";
 import ProductGallery from "@/components/ProductGallery";
+import { formatarPreco } from "@/lib/calculations";
 
 interface ShopifyProductData {
   id: string;
@@ -74,16 +72,6 @@ const Product = () => {
   const navigate = useNavigate();
   const [product, setProduct] = useState<ShopifyProductData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [pecas, setPecas] = useState<PecaPerfil2040[]>([
-    {
-      id: crypto.randomUUID(),
-      comprimentoMm: PRODUTO_DEFAULT_CONFIG.minComprimentoMm,
-      quantidade: 1,
-      servico: "sem_servico",
-      precoPorMetro: PRODUTO_DEFAULT_CONFIG.precoPorMetro,
-      precoTotalPeca: (PRODUTO_DEFAULT_CONFIG.minComprimentoMm / 1000) * PRODUTO_DEFAULT_CONFIG.precoPorMetro,
-    },
-  ]);
 
   const galleryImages = useMemo(
     () => product?.images?.edges?.map(edge => edge.node) ?? [],
@@ -94,18 +82,8 @@ const Product = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const data = await storefrontApiRequest(GET_PRODUCT_BY_HANDLE, { handle });
-        
-        if (data?.data?.productByHandle) {
-          setProduct(data.data.productByHandle);
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Produto não encontrado",
-            description: "O produto solicitado não foi encontrado.",
-          });
-          navigate("/");
-        }
+        // Product fetching will be implemented when new Shopify connection is made
+        setProduct(null);
       } catch (error) {
         console.error("Erro ao buscar produto:", error);
         toast({
@@ -124,30 +102,6 @@ const Product = () => {
     }
   }, [handle, navigate, toast]);
 
-  const adicionarPeca = () => {
-    const novaPeca: PecaPerfil2040 = {
-      id: crypto.randomUUID(),
-      comprimentoMm: PRODUTO_DEFAULT_CONFIG.minComprimentoMm,
-      quantidade: 1,
-      servico: "sem_servico",
-      precoPorMetro: PRODUTO_DEFAULT_CONFIG.precoPorMetro,
-      precoTotalPeca: (PRODUTO_DEFAULT_CONFIG.minComprimentoMm / 1000) * PRODUTO_DEFAULT_CONFIG.precoPorMetro,
-    };
-    setPecas([...pecas, novaPeca]);
-  };
-
-  const atualizarPeca = (index: number, pecaAtualizada: PecaPerfil2040) => {
-    const novasPecas = [...pecas];
-    novasPecas[index] = pecaAtualizada;
-    setPecas(novasPecas);
-  };
-
-  const removerPeca = (index: number) => {
-    if (pecas.length > 1) {
-      setPecas(pecas.filter((_, i) => i !== index));
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -155,22 +109,40 @@ const Product = () => {
         <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[400px]">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
+        <Footer />
       </div>
     );
   }
 
   if (!product) {
-    return null;
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <div className="container mx-auto px-4 py-8 flex-1">
+          <Button
+            variant="ghost"
+            className="mb-6"
+            onClick={() => navigate("/")}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar para Produtos
+          </Button>
+          <div className="text-center py-16">
+            <p className="text-muted-foreground">Conecte sua loja Shopify para ver os produtos.</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
   }
 
-  const productVariantId = product.variants.edges[0]?.node.id;
+  const price = parseFloat(product.variants.edges[0]?.node.price.amount || "0");
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header />
       
-      <div className="container mx-auto px-4 py-8">
-        {/* Breadcrumb / Navigation */}
+      <div className="container mx-auto px-4 py-8 flex-1">
         <Button
           variant="ghost"
           className="mb-6"
@@ -180,12 +152,9 @@ const Product = () => {
           Voltar para Produtos
         </Button>
 
-        {/* Product Header with Image */}
-        <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Product Image */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <ProductGallery images={galleryImages} />
 
-          {/* Product Info */}
           <div className="flex flex-col justify-center">
             <h1 className="text-3xl font-bold text-foreground mb-2">
               {product.title}
@@ -195,8 +164,8 @@ const Product = () => {
                 {product.description}
               </p>
             )}
-            <p className="text-sm text-muted-foreground mb-4">
-              Código: {product.handle.toUpperCase()} | Preço base: R$ 99,00/metro
+            <p className="text-3xl font-bold text-primary mb-6">
+              {formatarPreco(price)}
             </p>
             <div className="bg-card border rounded-lg p-4">
               <h3 className="font-semibold mb-2">Envio rápido</h3>
@@ -206,46 +175,9 @@ const Product = () => {
             </div>
           </div>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Formulários das Peças */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">
-                Configure suas peças
-              </h2>
-              <Button
-                onClick={adicionarPeca}
-                className="bg-accent hover:bg-accent/90"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Adicionar Dimensão
-              </Button>
-            </div>
-
-            {pecas.map((peca, index) => (
-              <PecaForm
-                key={peca.id}
-                peca={peca}
-                index={index}
-                onUpdate={(pecaAtualizada) => atualizarPeca(index, pecaAtualizada)}
-                onRemove={() => removerPeca(index)}
-                canRemove={pecas.length > 1}
-              />
-            ))}
-          </div>
-
-          {/* Resumo do Orçamento */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24">
-              <ResumoOrcamento
-                pecas={pecas}
-                productVariantId={productVariantId}
-              />
-            </div>
-          </div>
-        </div>
       </div>
+
+      <Footer />
     </div>
   );
 };

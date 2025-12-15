@@ -1,28 +1,18 @@
-import { PecaPerfil2040, ProdutoConfig, getServicoConfig } from "@/types/product";
-
 export function calcularPrecoPeca(
   comprimentoMm: number,
   quantidade: number,
   precoPorMetro: number = 99.0,
-  servicoId?: string
+  custoExtraServico: number = 0
 ): number {
   const comprimentoM = comprimentoMm / 1000;
   let precoBase = comprimentoM * precoPorMetro;
-  
-  // Adicionar custo extra do serviço, se houver
-  if (servicoId) {
-    const servicoConfig = getServicoConfig(servicoId as any);
-    if (servicoConfig) {
-      precoBase += servicoConfig.custoExtra;
-    }
-  }
-  
+  precoBase += custoExtraServico;
   const total = precoBase * quantidade;
   return Number(total.toFixed(2));
 }
 
 export function calcularResumoPedido(
-  pecas: PecaPerfil2040[],
+  pecas: Array<{ comprimentoMm: number; quantidade: number }>,
   precoPorMetro: number = 99.0
 ): { totalMetros: number; totalValor: number } {
   let totalMetros = 0;
@@ -50,11 +40,9 @@ export function formatarPreco(valor: number): string {
 
 export function validarComprimento(
   comprimento: number,
-  produtoConfig?: ProdutoConfig
+  min: number = 1,
+  max: number = 3000
 ): { valido: boolean; erro?: string } {
-  const min = produtoConfig?.minComprimentoMm || 1;
-  const max = produtoConfig?.maxComprimentoMm || 3000;
-  
   if (isNaN(comprimento)) {
     return { valido: false, erro: "Por favor, insira um número válido" };
   }
